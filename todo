@@ -1,0 +1,11 @@
+- Add folder for UI
+- Geom3D library:
+  - Layers:
+    - PointcloudLayer
+    - IFCLayer
+    - GeometryLayer
+  - Geometry subsystem
+  - Interactions:
+    - DrawInteraction
+    - SnapInteraction
+    - ModifyInteraction

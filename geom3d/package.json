@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@thatopen/components": "^2.4.5",
-    "@thatopen/components-front": "^2.4.4"
+    "@thatopen/components-front": "^2.4.4",
+    "earcut": "^3.0.1"
   }
 }
