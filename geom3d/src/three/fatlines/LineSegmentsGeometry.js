@@ -1,8 +1,8 @@
-import { THREE } from '../../../misc/DependencyManager.js';
+import { THREE } from '../../misc/DependencyManager.js';
 
 const Box3 = THREE.Box3;
 const Float32BufferAttribute = THREE.Float32BufferAttribute;
-const InstancedBufferGeometry = THREE.InstancedBufferAttribute;
+const InstancedBufferGeometry = THREE.InstancedBufferGeometry;
 const InstancedInterleavedBuffer = THREE.InstancedInterleavedBuffer;
 const InterleavedBufferAttribute = THREE.InterleavedBufferAttribute;
 const Sphere = THREE.Sphere;

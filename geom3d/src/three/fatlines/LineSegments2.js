@@ -1,15 +1,15 @@
-import {
-	Box3,
-	InstancedInterleavedBuffer,
-	InterleavedBufferAttribute,
-	Line3,
-	MathUtils,
-	Matrix4,
-	Mesh,
-	Sphere,
-	Vector3,
-	Vector4
-} from '../../../../public/dependencies/potree/build/libs/three.js/build/three.module.js';
+import { THREE } from '../../misc/DependencyManager.js';
+
+const Box3 = THREE.Box3;
+const InstancedInterleavedBuffer = THREE.InstancedInterleavedBuffer;
+const InterleavedBufferAttribute = THREE.InterleavedBufferAttribute;
+const Line3 = THREE.Line3;
+const MathUtils = THREE.MathUtils;
+const Matrix4 = THREE.Matrix4;
+const Mesh = THREE.Mesh;
+const Sphere = THREE.Sphere;
+const Vector3 = THREE.Vector3;
+const Vector4 = THREE.Vector4;
 
 import { LineSegmentsGeometry } from './LineSegmentsGeometry.js';
 import { LineMaterial } from './LineMaterial.js';

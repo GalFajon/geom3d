@@ -1,4 +1,4 @@
-import { THREE } from '../../../misc/DependencyManager.js';
+import { THREE } from '../../misc/DependencyManager.js';
 
 const BufferGeometry = THREE.BufferGeometry;
 const Float32BufferAttribute = THREE.Float32BufferAttribute;

@@ -11,7 +11,7 @@
  * }
  */
 
-import { THREE } from '../../../misc/DependencyManager.js';
+import { THREE } from '../../misc/DependencyManager.js';
 
 const ShaderLib = THREE.ShaderLib;
 const ShaderMaterial = THREE.ShaderMaterial;

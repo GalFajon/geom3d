@@ -1,14 +1,32 @@
 import { THREE, viewer } from "./misc/DependencyManager";
+import { Cursor } from "./Cursor.js";
+//import { Draw } from "./interactions/Draw.js";
+import { CSS2DRenderer, CSS2DObject } from "./three/CSS2DRenderer.js";
 
 export class View {
+    static cursor = new Cursor();
+
+    static overlayScene = new THREE.Scene();
+    static overlayRenderer = new CSS2DRenderer();
+
+    static pointMinScale = 0.01;
+    static pointMaxScale = 10;
+
     layers = [];
+    interactions = [];
 
     constructor(config) {
         if (config.layers) this.layers = config.layers;
+        if (config.interactions) this.interactions = config.interactions;
+
+        View.cursor.initializeEvents(this);
     }
 
     async initialize() {
+        for (let interaction of this.interactions) interaction.initialize();
         for (let layer of this.layers) await layer.attach();
+
+        this.everyFrame();
     }
 
     async addLayer(layer) {
@@ -48,4 +66,58 @@ export class View {
 
         this.zooomToBbox(bbox);
     }
+
+    scale() {
+        if (View.cursor) {
+            let distance = View.cursor.model.position.distanceTo(viewer.scene.view.position);
+            let pr = Potree.Utils.projectedRadius(1, viewer.scene.getActiveCamera(), distance, viewer.clientwidth, viewer.renderer.domElement.clientHeight);
+            let scale = 10 / pr;
+
+            if (scale > 3) scale = 2;
+
+            if (View.cursor.snapped) scale *= 3;
+
+            View.cursor.model.scale.set(scale, scale, scale);
+        }
+
+        for (let layer of this.layers) {
+            if (layer.type == 'OverlayLayer' && layer.UseVisibilityDistance) {
+                for (let overlay of source.Overlays) {
+                    if (overlay.model.position.distanceTo(viewer.scene.view.position) > overlay.VisibilityDistance) overlay.model.visible = false;
+                    else overlay.model.visible = true;
+                }
+            }
+
+            if (layer.type == 'GeometryLayer') {
+                let distance = viewer.scene.view.position.z - View.cursor.model.position.z;
+                let pr = Potree.Utils.projectedRadius(1, viewer.scene.getActiveCamera(), distance, viewer.clientwidth, viewer.renderer.domElement.clientHeight);
+                let scale = 30 / pr;
+
+                if (scale < View.pointMinScale) scale = View.pointMinScale;
+                if (scale > View.pointMaxScale) scale = View.pointMaxScale;
+
+                Cursor.raycaster.params.Points.threshold = scale;
+                layer.pointscloud.material.size = scale;
+                //Draw.raycaster.params.Points.threshold = scale;
+            }
+        }
+    }
+
+    everyFrame() {
+        this.scale();
+
+        viewer.renderer.clearDepth();
+        viewer.renderer.render(View.overlayScene, viewer.scene.getActiveCamera());
+        View.overlayRenderer.render(viewer.scene.scene, viewer.scene.getActiveCamera());
+        View.overlayRenderer.render(View.overlayScene, viewer.scene.getActiveCamera());
+
+        requestAnimationFrame(this.everyFrame.bind(this));
+
+        for (let layer of this.layers) {
+            if (layer.visible == false) layer.hide();
+            else layer.show();
+        }
+    }
 }
+
+View.cursor.attachToScene(viewer.scene.scene);

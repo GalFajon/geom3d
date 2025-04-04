@@ -12,6 +12,8 @@ export class PointcloudLayer extends Layer {
 
         if (config.urls) this.urls = config.urls;
         if (config.material) this.material = config.material;
+
+        this.type = 'PointcloudLayer';
     }
 
     async attach() {

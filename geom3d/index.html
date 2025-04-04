@@ -28,7 +28,7 @@
         </div>
 
         <script type="module">
-            import { initialize, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View } from './geom3d.js';
+            import { initialize, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw } from './geom3d.js';
 
             async function main() {
                 let ptcldLayer = new PointcloudLayer({
@@ -42,10 +42,19 @@
                     ]
                 });
 
+                let draw = new Draw({
+                    layer: geomLayer,
+                    type: 'Polygon'
+                })
+
                 let view = new View({
                     layers: [
                         geomLayer
                         //ptcldLayer
+                    ],
+
+                    interactions: [
+                        draw
                     ]
                 });
 
@@ -57,6 +66,10 @@
                 })
 
                 view.center();
+
+                draw.addEventListener('drawend', (e) => {
+                    geomLayer.add(e.detail);
+                });
             }
 
             main();

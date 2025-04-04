@@ -10,9 +10,14 @@ import { Line } from "./src/geometry/Line";
 import { Polygon } from './src/geometry/Polygon';
 import { Point } from './src/geometry/Point';
 
+//interactions
+import { Draw } from "./src/interactions/Draw";
+
 // support classes
 import { View } from "./src/View";
 import { NoCloudControls } from "./src/misc/noCloudControls";
+
+let currentView = null;
 
 export async function initialize(config) {
     if (!config) config = {};
@@ -25,7 +30,11 @@ export async function initialize(config) {
     }
 
     initializeViewer(config);
-    if (config.view) await config.view.initialize();
+
+    if (config.view) {
+        currentView = config.view;
+        await config.view.initialize();
+    }
 
 }
 
@@ -50,8 +59,10 @@ async function initializeViewer(config) {
 
 }
 
+// add namespaces
 export {
     PointcloudLayer, GeometryLayer,
     Line, Polygon, Point,
+    Draw,
     View
-};
+}

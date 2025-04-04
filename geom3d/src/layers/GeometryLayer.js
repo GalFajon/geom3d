@@ -1,5 +1,7 @@
 import { Line } from "../geometry/Line";
 import { Polygon } from "../geometry/Polygon";
+import { Point } from "../geometry/Point";
+
 import { THREE, viewer } from "../misc/DependencyManager";
 import { Layer } from "./Layer";
 
@@ -9,7 +11,6 @@ export class GeometryLayer extends Layer {
     geometries = [];
     models = [];
 
-    // point specific stuff
     points = []
     // TODO: maybe make the point a nice round image?
     pointscloud = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: '#C41E3A', size: 0.5, sizeAttenuation: true }));
@@ -22,6 +23,8 @@ export class GeometryLayer extends Layer {
         for (let geometry of this.geometries) this.add(geometry);
 
         this.updatePoints();
+
+        this.type = 'GeometryLayer';
     }
 
     updatePoints() {
@@ -77,6 +80,10 @@ export class GeometryLayer extends Layer {
         if (geometry instanceof Line || geometry instanceof Polygon) {
             this.models.push(geometry.model);
             viewer.scene.scene.add(geometry.model);
+        }
+        else if (geometry instanceof Point) {
+            this.points.push(geometry);
+            this.updatePoints();
         }
     }
 

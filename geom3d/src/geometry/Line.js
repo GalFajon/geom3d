@@ -1,9 +1,9 @@
 import { Geometry } from './Geometry.js';
 import { THREE } from '../misc/DependencyManager.js';
 
-import { LineMaterial } from './three/fatlines/LineMaterial.js'
-import { LineGeometry } from './three/fatlines/LineGeometry.js';
-import { Line2 } from './three/fatlines/Line2.js';
+import { LineMaterial } from '../three/fatlines/LineMaterial.js'
+import { LineGeometry } from '../three/fatlines/LineGeometry.js';
+import { Line2 } from '../three/fatlines/Line2.js';
 
 export class Line extends Geometry {
 
@@ -16,11 +16,14 @@ export class Line extends Geometry {
         depthWrite: true
     });
 
-    constructor(vectors) {
+    constructor(vectors, config) {
         super();
 
         this.vectors = vectors;
         this.type = "Line"
+
+        if (config && config.material) this.material = config.material;
+        else this.material = Line.material;
 
         this.update();
 
@@ -62,7 +65,7 @@ export class Line extends Geometry {
             this.model.material.dispose();
         }
 
-        this.model = new Line2(geometry, Line.material);
+        this.model = new Line2(geometry, this.material);
         this.model.computeLineDistances();
         this.model.scale.set(1, 1, 1);
         this.model.position.set(...this.vectors[0]);

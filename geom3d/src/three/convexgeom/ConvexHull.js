@@ -1,4 +1,4 @@
-import { THREE } from '../../../misc/DependencyManager.js';
+import { THREE } from '../../misc/DependencyManager.js';
 
 const Line3 = THREE.Line3;
 const Plane = THREE.Plane;

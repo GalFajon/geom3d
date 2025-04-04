@@ -1,6 +1,6 @@
 import { Geometry } from './Geometry.js';
 import { THREE } from '../misc/DependencyManager.js';
-import { ConvexGeometry } from '../geometry/three/convexgeom/ConvexGeometry.js';
+import { ConvexGeometry } from '../three/convexgeom/ConvexGeometry.js';
 import * as earcut from 'earcut'
 
 export class Polygon extends Geometry {
@@ -9,13 +9,16 @@ export class Polygon extends Geometry {
     vectors = [];
     holes = [];
 
-    constructor(positions) {
+    constructor(positions, config) {
         super();
 
         this.vectors = positions[0];
         this.holes = this.getHoles(positions);
 
-        this.model = new THREE.Mesh(this.generateGeometry(positions), Polygon.material);
+        if (config && config.material) this.material = config.material;
+        else this.material = Polygon.material;
+
+        this.model = new THREE.Mesh(this.generateGeometry(positions), this.material);
         this.model.position.set(positions[0][0][0], positions[0][0][1], positions[0][0][2]);
 
         this.type = "Polygon";
