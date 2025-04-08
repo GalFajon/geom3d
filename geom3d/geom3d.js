@@ -3,7 +3,11 @@ import { viewer } from "./src/misc/DependencyManager";
 
 // layers
 import { PointcloudLayer } from "./src/layers/PointcloudLayer";
-import { GeometryLayer } from "./src/layers/geometryLayer";
+import { GeometryLayer } from "./src/layers/GeometryLayer";
+import { OverlayLayer } from "./src/layers/OverlayLayer";
+
+// overlay
+import { Overlay } from './src/overlay/Overlay';
 
 // geometry
 import { Line } from "./src/geometry/Line";
@@ -12,6 +16,8 @@ import { Point } from './src/geometry/Point';
 
 //interactions
 import { Draw } from "./src/interactions/Draw";
+import { Snap } from "./src/interactions/Snap";
+import { Modify } from "./src/interactions/Modify";
 
 // support classes
 import { View } from "./src/View";
@@ -61,8 +67,9 @@ async function initializeViewer(config) {
 
 // add namespaces
 export {
-    PointcloudLayer, GeometryLayer,
+    PointcloudLayer, GeometryLayer, OverlayLayer,
+    Overlay,
     Line, Polygon, Point,
-    Draw,
+    Draw, Snap, Modify,
     View
 }

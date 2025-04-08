@@ -26,17 +26,13 @@ export class DrawHelper {
         this.pointscloud.userData = this;
 
         this.geomType = config.geomType;
-        console.log(this.geomType);
-        this.type = "DrawHelper";
     }
 
     addVector(vector) {
-        console.log(vector);
         this.Vectors.push(vector);
 
         let point = new Point(vector, { material: DrawHelper.pointMaterial });
         this.Points.push(point);
-        console.log(point);
 
         this.updatePoints();
 

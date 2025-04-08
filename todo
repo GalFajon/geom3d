@@ -1,11 +1,16 @@
 - Add folder for UI
 - Geom3D library:
   - Layers:
-    - PointcloudLayer
+    - PointcloudLayer -> OK
     - IFCLayer
-    - GeometryLayer
-  - Geometry subsystem
+    - GeometryLayer -> OK
+  - Geometry subsystem -> OK
   - Interactions:
-    - DrawInteraction
-    - SnapInteraction
+    - DrawInteraction -> OK
+    - SnapInteraction -> OK
     - ModifyInteraction
+
+- Bugs:
+  - polygon drawing doesnt work well on high vertice count polygons.
+  - nared scalable snaplines
+  - points on ptcld layer dont scale properly

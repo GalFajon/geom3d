@@ -28,33 +28,21 @@
         </div>
 
         <script type="module">
-            import { initialize, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw } from './geom3d.js';
+            import { initialize, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Modify, OverlayLayer, Overlay } from './geom3d.js';
+
+            console.log(document.getElementById('overlay_text_2'));
 
             async function main() {
-                let ptcldLayer = new PointcloudLayer({
-                    urls: ['/models/cloud.js']
-                });
-
-                let geomLayer = new GeometryLayer({
-                    geometries: [
-                        new Point([0, 0, 0]),
-                        new Point([10, 10, 0])
+                let olayer = new OverlayLayer({
+                    useVisiblityDistance: false,
+                    overlays: [
+                        new Overlay([1, 1, 1], { element: document.getElementById('overlay_text_2') }),
                     ]
                 });
 
-                let draw = new Draw({
-                    layer: geomLayer,
-                    type: 'Polygon'
-                })
-
                 let view = new View({
                     layers: [
-                        geomLayer
-                        //ptcldLayer
-                    ],
-
-                    interactions: [
-                        draw
+                        olayer
                     ]
                 });
 
@@ -66,13 +54,14 @@
                 })
 
                 view.center();
-
-                draw.addEventListener('drawend', (e) => {
-                    geomLayer.add(e.detail);
-                });
             }
 
             main();
         </script>
+
+        <div id="overlay_text_2" style="color:red; background-color:white;">
+            <h1>My second overlay.</h1>
+            <button onclick="alert('working')">A button.</button>
+        </div>
     </body>
 </html>

@@ -8,6 +8,7 @@ import { Point } from '../geometry/Point.js';
 import { Polygon } from '../geometry/Polygon.js';
 import { Cursor } from '../Cursor.js';
 import { View } from '../View.js';
+import { GeometryLayer } from '../layers/GeometryLayer.js';
 
 export class Draw extends Interaction {
 
@@ -33,7 +34,6 @@ export class Draw extends Interaction {
         this.viewingImage360 = false;
         this.viewingOrientedImage = false;
 
-        this.type = "DrawInteraction";
         this.active = true;
     }
 
@@ -44,9 +44,9 @@ export class Draw extends Interaction {
         viewer.addEventListener('oriented_image_focused', this.setViewingOrientedImage2);
         viewer.addEventListener('oriented_image_unfocused', this.unsetViewingOrientedImage2);
         if (!this.parentSource) {
-            throw 'Must have parameter parentSource.';
+            throw 'Must have parameter layer.';
         }
-        else if (this.parentSource.type == "GeometryLayer") {
+        else if (this.parentSource instanceof GeometryLayer) {
             this.domElement.addEventListener('pointerup', this.handleGeometrySourcePointerUp2);
         }
         else {
@@ -99,7 +99,6 @@ export class Draw extends Interaction {
 
                 if (this.drawHelper && !View.cursor.movedMouse) {
                     let drawnGeometry = undefined;
-                    console.log(this.geomType);
 
                     if (this.geomType == "Point" && this.drawHelper.Vectors.length > 0) {
                         let points = [];
@@ -148,7 +147,7 @@ export class Draw extends Interaction {
 
     undo(index) {
         if (this.active) {
-            if (this.parentSource.type == "GeometrySource") {
+            if (this.parentSource instanceof GeometrySource) {
                 this.vectors.pop(View.cursor.position);
                 if (this.drawHelper) this.drawHelper.undo(index);
 
@@ -160,6 +159,7 @@ export class Draw extends Interaction {
     dispatchDrawEnd(detail) {
         const customEvent = new CustomEvent('drawend', { detail: detail, source: this.parentSource });
         this.dispatchEvent(customEvent);
+        this.parentSource.dispatchEvent(customEvent);
     }
 
     setViewingOrientedImage() {

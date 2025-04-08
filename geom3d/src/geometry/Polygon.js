@@ -20,8 +20,6 @@ export class Polygon extends Geometry {
 
         this.model = new THREE.Mesh(this.generateGeometry(positions), this.material);
         this.model.position.set(positions[0][0][0], positions[0][0][1], positions[0][0][2]);
-
-        this.type = "Polygon";
         this.model.userData = this;
     }
 
@@ -57,34 +55,22 @@ export class Polygon extends Geometry {
 
     generateGeometry(positions) {
         let localPositions = this.localizeVectors(positions);
+        let data = earcut.flatten(localPositions);
+        let triangles = earcut.default(data.vertices, data.holes, data.dimensions);
 
-        if (positions[0].length < 4 || this.holes.length > 0) {
-            let data = earcut.flatten(localPositions);
-            let triangles = earcut.default(data.vertices, data.holes, data.dimensions);
+        let geometry = new THREE.Geometry();
 
-            let geometry = new THREE.Geometry();
-
-            for (let i = 0; i < data.vertices.length; i += 3) {
-                geometry.vertices.push(new THREE.Vector3(data.vertices[i], data.vertices[i + 1], data.vertices[i + 2]))
-            }
-
-            for (let i = 0; i < triangles.length; i += 3) {
-                geometry.faces.push(new THREE.Face3(triangles[i], triangles[i + 1], triangles[i + 2]))
-            }
-
-            geometry.computeFaceNormals();
-
-            return geometry;
+        for (let i = 0; i < data.vertices.length; i += 3) {
+            geometry.vertices.push(new THREE.Vector3(data.vertices[i], data.vertices[i + 1], data.vertices[i + 2]))
         }
-        else {
-            let vectors = [];
 
-            for (let ring of localPositions) {
-                for (let coords of ring) vectors.push(new THREE.Vector3(...coords));
-            }
-
-            return new ConvexGeometry(vectors);
+        for (let i = 0; i < triangles.length; i += 3) {
+            geometry.faces.push(new THREE.Face3(triangles[i], triangles[i + 1], triangles[i + 2]))
         }
+
+        geometry.computeFaceNormals();
+
+        return geometry;
     }
 
     update() {

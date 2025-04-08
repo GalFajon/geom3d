@@ -1,4 +1,6 @@
-export class Layer {
+import { EventDispatcher } from '../misc/EventDispatcher.js'
+
+export class Layer extends EventDispatcher {
     attached = false;
 
     attach() { throw "Attach function must be overridden." }

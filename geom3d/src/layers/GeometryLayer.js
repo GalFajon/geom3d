@@ -21,10 +21,6 @@ export class GeometryLayer extends Layer {
 
         this.geometries = config.geometries;
         for (let geometry of this.geometries) this.add(geometry);
-
-        this.updatePoints();
-
-        this.type = 'GeometryLayer';
     }
 
     updatePoints() {
@@ -35,7 +31,7 @@ export class GeometryLayer extends Layer {
         let first = true;
 
         for (let geometry of this.geometries) {
-            if (geometry.type == 'Point') {
+            if (geometry instanceof Point) {
                 if (first == true) {
                     rootCoords = geometry.vectors;
                     first = false;
@@ -119,8 +115,18 @@ export class GeometryLayer extends Layer {
         let bbox = new THREE.Box3();
 
         for (let geometry of this.geometries) {
-            for (let vector of geometry.vectors) {
-                bbox.expandByPoint(new THREE.Vector3(vector));
+            if (geometry instanceof Line) {
+                for (let vector of geometry.vectors) {
+                    bbox.expandByPoint(new THREE.Vector3(...vector));
+                }
+            }
+            else if (geometry instanceof Polygon) {
+                for (let vector of geometry.vectors) {
+                    bbox.expandByPoint(new THREE.Vector3(...vector));
+                }
+            }
+            else if (geometry instanceof Point) {
+                bbox.expandByPoint(new THREE.Vector3(geometry.vectors));
             }
         }
 

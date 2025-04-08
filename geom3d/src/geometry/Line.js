@@ -1,5 +1,5 @@
 import { Geometry } from './Geometry.js';
-import { THREE } from '../misc/DependencyManager.js';
+import { THREE, viewer } from '../misc/DependencyManager.js';
 
 import { LineMaterial } from '../three/fatlines/LineMaterial.js'
 import { LineGeometry } from '../three/fatlines/LineGeometry.js';
@@ -20,7 +20,6 @@ export class Line extends Geometry {
         super();
 
         this.vectors = vectors;
-        this.type = "Line"
 
         if (config && config.material) this.material = config.material;
         else this.material = Line.material;
@@ -55,7 +54,6 @@ export class Line extends Geometry {
 
     update() {
         let localPositions = this.localizeVectors(this.flattenVectors(this.vectors));
-
         let geometry = new LineGeometry();
 
         geometry.setPositions(localPositions);
@@ -63,11 +61,14 @@ export class Line extends Geometry {
         if (this.model) {
             this.model.geometry.dispose();
             this.model.material.dispose();
-        }
 
-        this.model = new Line2(geometry, this.material);
-        this.model.computeLineDistances();
-        this.model.scale.set(1, 1, 1);
-        this.model.position.set(...this.vectors[0]);
+            this.model.geometry = geometry;
+        }
+        else {
+            this.model = new Line2(geometry, this.material);
+            this.model.computeLineDistances();
+            this.model.scale.set(1, 1, 1);
+            this.model.position.set(...this.vectors[0]);
+        }
     }
 }

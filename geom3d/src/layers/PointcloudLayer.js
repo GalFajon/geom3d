@@ -12,8 +12,6 @@ export class PointcloudLayer extends Layer {
 
         if (config.urls) this.urls = config.urls;
         if (config.material) this.material = config.material;
-
-        this.type = 'PointcloudLayer';
     }
 
     async attach() {
@@ -43,9 +41,6 @@ export class PointcloudLayer extends Layer {
 
                 if (this.attached) this.urls.push(url);
                 this.pointclouds.push(pointcloud);
-                viewer.scene.addPointCloud(pointcloud);
-                viewer.fitToScreen();
-
                 viewer.scene.addPointCloud(pointcloud);
                 viewer.fitToScreen();
 
