@@ -6,6 +6,7 @@ export class PointcloudLayer extends Layer {
     urls = [];
     material = null;
     pointclouds = [];
+    attached = false;
 
     constructor(config) {
         super();
@@ -16,6 +17,7 @@ export class PointcloudLayer extends Layer {
 
     async attach() {
         for (let url of this.urls) await this.add(url, this.material);
+        this.attached = true;
     }
 
     detach() {

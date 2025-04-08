@@ -5,6 +5,7 @@ export class OverlayLayer extends Layer {
     overlays = []
     models = []
     UseVisibilityDistance = true
+    attached = false;
 
     constructor(config) {
         super();
@@ -15,15 +16,17 @@ export class OverlayLayer extends Layer {
     }
 
     async attach() {
-        for (let overlay of this.overlays) this.add(overlay, false);
+        for (let overlay of this.overlays) this.add(overlay);
+        this.attached = true;
     }
 
     detach() {
         for (let overlay of this.overlays) this.remove(overlay);
+        this.attached = false;
     }
 
-    async add(overlay, addToArray = true) {
-        if (addToArray) this.overlays.push(overlay);
+    async add(overlay) {
+        if (this.attached) this.overlays.push(overlay);
         overlay.attachToScene();
         this.models.push(overlay.model);
         this.updateVisibility();

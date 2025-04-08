@@ -28,21 +28,14 @@
         </div>
 
         <script type="module">
-            import { initialize, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Modify, OverlayLayer, Overlay } from './geom3d.js';
-
-            console.log(document.getElementById('overlay_text_2'));
+            import { initialize, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Modify, OverlayLayer, Overlay, GLTFLayer } from './geom3d.js';
 
             async function main() {
-                let olayer = new OverlayLayer({
-                    useVisiblityDistance: false,
-                    overlays: [
-                        new Overlay([1, 1, 1], { element: document.getElementById('overlay_text_2') }),
-                    ]
-                });
-
                 let view = new View({
                     layers: [
-                        olayer
+                        new GLTFLayer({
+                            urls: ['/models/gltf/Avocado.gltf']
+                        })
                     ]
                 });
 
