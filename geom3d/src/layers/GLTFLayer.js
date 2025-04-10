@@ -78,6 +78,6 @@ export class GLTFLayer extends Layer {
             for (let child of model.children) if (child.geometry && child.geometry.boundingBox) bbox.union(child.geometry.boundingBox);
         }
 
-        return bbox;
+        return bbox.expandByScalar(0.05);
     }
 }
