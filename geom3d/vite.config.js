@@ -3,7 +3,13 @@ import * as path from 'path';
 
 export default defineConfig({
     server: {
-        cors: true
+        cors: true,
+        proxy: {
+            '/pointclouds': {
+                target: 'http://localhost:3000',
+                changeOrigin: true
+            }
+        }
     },
     build: {
         lib: {

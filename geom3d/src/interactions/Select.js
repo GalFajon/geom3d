@@ -93,10 +93,12 @@ export class Select extends Interaction {
         }
         if (this.parentSource.pointscloud) {
             for (let [key, value] of this.parentSource.pointscloud.entries()) {
-                let pointIntersects = this.raycaster.intersectObject(value, false);
-                console.log("POINT INTERSECTS: ", pointIntersects);
-                for (let intersect of pointIntersects) {
-                    intersects.push({ object: { userData: this.parentSource.points[intersect.index] }, point: intersect.point, distance: intersect.distance });
+                if (this.parentSource.pointvertices.get(key).length > 0) {
+                    let pointIntersects = this.raycaster.intersectObject(value, false);
+
+                    for (let intersect of pointIntersects) {
+                        intersects.push({ object: { userData: this.parentSource.points.get(key)[intersect.index] }, point: intersect.point, distance: intersect.distance });
+                    }
                 }
             }
         }

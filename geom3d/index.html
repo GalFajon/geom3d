@@ -37,29 +37,21 @@
                     }
                 })
 
-                let layer = new GeometryLayer({
-                    geometries: [ 
-                        new Point([0,0,0]),
-                        new Point([20,20,20]),
-                        new Point([30,30,30]),
-                        new Line([[0,0,0], [10,10,10]])
+                let layer = new PointcloudLayer({
+                    urls: [ 
+                        '/pointclouds/fields/cloud.js'
                     ]
                 });
 
-                let s = new Select({layer: layer});
-
                 let view = new View({
-                    layers: [ layer ],
-                    interactions: [ s ]
+                    layers: [ layer ]
                 });
 
                 setView(view);
-                view.center();
-                
-                s.addEventListener('selected', (e) => {
-                    console.log(e);
-                    layer.remove(e.detail.Geometry);
-                })
+                //view.center();
+
+                window.view = view;
+                window.layer = layer;
             }
 
             main();

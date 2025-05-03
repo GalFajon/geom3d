@@ -11,7 +11,7 @@ export class GeometryLayer extends Layer {
     static lineSelectionMaterial = new LineMaterial( { color: 'lightgreen', linewidth: 5, vertexColors: false, resolution: new THREE.Vector2(1000, 1000), dashed: false, alphaToCoverage: true });
     
     static pointMaterial = new THREE.PointsMaterial({ color: '#C41E3A', size: 0.5, sizeAttenuation: true });
-    static selectedPointMaterial = new THREE.PointsMaterial({ color: '#C41E3A', size: 0.5, sizeAttenuation: true });
+    static selectedPointMaterial = new THREE.PointsMaterial({ color: 'lightgreen', size: 0.5, sizeAttenuation: true });
 
     visible = true;
     geometries = [];
@@ -57,7 +57,6 @@ export class GeometryLayer extends Layer {
                 }
 
                 let relativeCoords = [geometry.vectors[0] - rootCoords[0], geometry.vectors[1] - rootCoords[1], geometry.vectors[2] - rootCoords[2]];
-                console.log(geometry);
 
                 if (geometry.highlighted) {
                     this.points.get('highlighted').push(geometry);
@@ -79,13 +78,12 @@ export class GeometryLayer extends Layer {
                 value.geometry.verticesNeedUpdate = true;
                 value.geometry.computeBoundingSphere();
                 value.position.set(...rootCoords);
+                viewer.scene.scene.add(value);
             }
             else {
-                //value.geometry.dispose();
-                //value.material.dispose();
+                value.geometry.dispose();
+                value.material.dispose();
             }
-
-            viewer.scene.scene.add(value);
         }
     }
 
@@ -98,12 +96,12 @@ export class GeometryLayer extends Layer {
         for (let geometry of this.geometries) this.remove(geometry, false);
 
         this.geometries = [];
+
+        this.updatePoints();
         this.attached = false;
     }
 
     highlightGeometry(geometry) {
-        console.log("HIGHLIGHTING ", geometry)
-
         if (geometry instanceof Line) {
             geometry.model.material = GeometryLayer.lineSelectionMaterial;
         }
@@ -147,21 +145,23 @@ export class GeometryLayer extends Layer {
         this.dispatchEvent(customEvent);
     }
 
-    remove(geometry, removeFromArray = true) {
+    remove(geometry, removeFromArray = true) {        
         if (
-            (geometry instanceof Line || geometry instanceof Polygon) &&
             this.geometries.indexOf(geometry) > -1
         ) {
             let i = this.geometries.indexOf(geometry);
-
-            viewer.scene.scene.remove(this.models[i]);
+            
+            if (geometry instanceof Line || geometry instanceof Polygon) {
+                viewer.scene.scene.remove(geometry.model);
+            }
 
             if (removeFromArray) {
-                this.models.splice(i, 1);
+                if (this.models.indexOf(geometry.model) > -1) this.models.splice( this.models.indexOf(geometry.model), 1);
                 this.geometries.splice(i, 1);
             }
         }
-        else this.updatePoints();
+
+        if (geometry instanceof Point && removeFromArray) this.updatePoints();
 
         const customEvent = new CustomEvent('removed', { detail: { source: this, geometry: geometry } });
         this.dispatchEvent(customEvent);
@@ -169,6 +169,7 @@ export class GeometryLayer extends Layer {
 
     updateVisibility() {
         for (let models of this.models) models.visible = this.visible;
+        for (let pointscloud of this.pointscloud.values()) pointscloud.visible = this.visible;
     }
 
     show() {
