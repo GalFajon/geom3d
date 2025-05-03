@@ -28,33 +28,41 @@
         </div>
 
         <script type="module">
-            import { initialize, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Modify, OverlayLayer, Overlay, GLTFLayer } from './geom3d.js';
+            import { initialize, setView, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, OverlayLayer, Overlay, GLTFLayer } from './geom3d.js';
 
             async function main() {
-                let view = new View({
-                    layers: [
-                        new GLTFLayer({
-                            urls: ['/models/gltf/Avocado.gltf']
-                        })
-                    ]
-                });
-
                 await initialize({
                     viewer: {
                         background: 'skybox'
-                    },
-                    view: view
+                    }
                 })
 
+                let layer = new GeometryLayer({
+                    geometries: [ 
+                        new Point([0,0,0]),
+                        new Point([20,20,20]),
+                        new Point([30,30,30]),
+                        new Line([[0,0,0], [10,10,10]])
+                    ]
+                });
+
+                let s = new Select({layer: layer});
+
+                let view = new View({
+                    layers: [ layer ],
+                    interactions: [ s ]
+                });
+
+                setView(view);
                 view.center();
+                
+                s.addEventListener('selected', (e) => {
+                    console.log(e);
+                    layer.remove(e.detail.Geometry);
+                })
             }
 
             main();
         </script>
-
-        <div id="overlay_text_2" style="color:red; background-color:white;">
-            <h1>My second overlay.</h1>
-            <button onclick="alert('working')">A button.</button>
-        </div>
     </body>
 </html>

@@ -3,6 +3,7 @@ import { CSS2DObject } from "../three/CSS2DRenderer.js";
 
 export class Overlay {
     constructor([x, y, z], config) {
+        type = "Overlay"
         this.vectors = [[x, y, z]];
 
         if (config.element) {

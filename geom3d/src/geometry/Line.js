@@ -1,12 +1,12 @@
 import { Geometry } from './Geometry.js';
 import { THREE, viewer } from '../misc/DependencyManager.js';
 
-import { LineMaterial } from '../three/fatlines/LineMaterial.js'
+import { LineMaterial } from '../three/fatlines/LineMaterial.js';
 import { LineGeometry } from '../three/fatlines/LineGeometry.js';
 import { Line2 } from '../three/fatlines/Line2.js';
 
 export class Line extends Geometry {
-
+    type = "Line"
     static material = new LineMaterial({
         color: 0xff0000,
         linewidth: 3,

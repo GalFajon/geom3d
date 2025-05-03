@@ -9,10 +9,13 @@ export class GLTFLayer extends Layer {
     models = [];
     attached = false;
 
+    type = "GLTFLayer"
+
     static loader = new GLTFLoader();
 
     constructor(config) {
-        super();
+        super(config);
+
         if (config.urls) this.urls = config.urls;
     }
 
@@ -23,6 +26,8 @@ export class GLTFLayer extends Layer {
 
     detach() {
         for (let model of this.models) this.remove(model);
+        
+        this.models = [];
         this.attached = false;
     }
 
@@ -46,14 +51,16 @@ export class GLTFLayer extends Layer {
         })
     }
 
-    remove(model) {
+    remove(model, removeFromArray = true) {
         viewer.scene.remove(model)
 
         if (this.models.indexOf(model) > -1) {
             let i = this.models.indexOf(model);
 
-            this.models.splice(i, 1);
-            this.urls.splice(i, 1);
+            if (removeFromArray) {
+                this.models.splice(i, 1);
+                this.urls.splice(i, 1);
+            }
         }
     }
 

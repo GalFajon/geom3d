@@ -4,6 +4,7 @@ import { ConvexGeometry } from '../three/convexgeom/ConvexGeometry.js';
 import * as earcut from 'earcut'
 
 export class Polygon extends Geometry {
+    type = "Polygon"
     static material = new THREE.MeshBasicMaterial({ color: 'purple', side: THREE.DoubleSide });
 
     vectors = [];

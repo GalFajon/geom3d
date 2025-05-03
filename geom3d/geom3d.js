@@ -1,5 +1,5 @@
 // dependencies
-import { viewer } from "./src/misc/DependencyManager";
+import { viewer, initialize as initializeDependencies } from "./src/misc/DependencyManager";
 
 // layers
 import { PointcloudLayer } from "./src/layers/PointcloudLayer";
@@ -19,6 +19,7 @@ import { Point } from './src/geometry/Point';
 import { Draw } from "./src/interactions/Draw";
 import { Snap } from "./src/interactions/Snap";
 import { Modify } from "./src/interactions/Modify";
+import { Select } from "./src/interactions/Select";
 
 // support classes
 import { View } from "./src/View";
@@ -27,6 +28,8 @@ import { NoCloudControls } from "./src/misc/noCloudControls";
 let currentView = null;
 
 export async function initialize(config) {
+    initializeDependencies();
+
     if (!config) config = {};
     if (!config.viewer) {
         config.viewer = {}
@@ -37,12 +40,13 @@ export async function initialize(config) {
     }
 
     initializeViewer(config);
+}
 
-    if (config.view) {
-        currentView = config.view;
-        await config.view.initialize();
+export async function setView(view) {
+    if (view) {
+        currentView = view;
+        await view.initialize();
     }
-
 }
 
 async function initializeViewer(config) {
@@ -71,6 +75,6 @@ export {
     PointcloudLayer, GeometryLayer, OverlayLayer, GLTFLayer,
     Overlay,
     Line, Polygon, Point,
-    Draw, Snap, Modify,
+    Draw, Snap, Modify, Select,
     View
 }

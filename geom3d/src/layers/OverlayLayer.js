@@ -7,8 +7,10 @@ export class OverlayLayer extends Layer {
     UseVisibilityDistance = true
     attached = false;
 
+    type = "OverlayLayer"
+
     constructor(config) {
-        super();
+        super(config);
 
         if (config) {
             if (config.overlays) this.overlays = config.overlays;

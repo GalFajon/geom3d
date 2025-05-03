@@ -8,8 +8,10 @@ export class PointcloudLayer extends Layer {
     pointclouds = [];
     attached = false;
 
+    type = "PointcloudLayer"
+
     constructor(config) {
-        super();
+        super(config);
 
         if (config.urls) this.urls = config.urls;
         if (config.material) this.material = config.material;
@@ -21,7 +23,10 @@ export class PointcloudLayer extends Layer {
     }
 
     detach() {
-        for (let pointcloud of this.pointclouds) this.remove(pointcloud);
+        for (let pointcloud of this.pointclouds) this.remove(pointcloud, false);
+
+        this.pointclouds = [];
+        this.urls = [];
     }
 
     async add(url, config) {
@@ -52,14 +57,16 @@ export class PointcloudLayer extends Layer {
         })
     }
 
-    remove(pointcloud) {
-        viewer.scene.remove(pointcloud)
+    remove(pointcloud, removeFromArray = true) {
+        viewer.scene.scenePointCloud.remove(pointcloud)
 
         if (this.pointclouds.indexOf(pointcloud) > -1) {
             let i = this.pointclouds.indexOf(pointcloud);
 
-            this.pointclouds.splice(i, 1);
-            this.urlsl.splice(i, 1);
+            if (removeFromArray) {
+                this.pointclouds.splice(i, 1);
+                this.urls.splice(i, 1);
+            }
         }
     }
 

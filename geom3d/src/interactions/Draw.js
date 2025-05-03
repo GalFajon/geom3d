@@ -11,6 +11,7 @@ import { View } from '../View.js';
 import { GeometryLayer } from '../layers/GeometryLayer.js';
 
 export class Draw extends Interaction {
+    type = "Draw"
 
     constructor(config) {
         super(config);
@@ -43,6 +44,7 @@ export class Draw extends Interaction {
 
         viewer.addEventListener('oriented_image_focused', this.setViewingOrientedImage2);
         viewer.addEventListener('oriented_image_unfocused', this.unsetViewingOrientedImage2);
+        
         if (!this.parentSource) {
             throw 'Must have parameter layer.';
         }
@@ -54,7 +56,19 @@ export class Draw extends Interaction {
         }
     }
 
-    async initialize() {
+    removeEventListeners() {
+        viewer.removeEventListener('360image_focused', this.setViewingImage3602);
+        viewer.removeEventListener('360image_unfocused', this.unsetViewingImage3602);
+
+        viewer.removeEventListener('oriented_image_focused', this.setViewingOrientedImage2);
+        viewer.removeEventListener('oriented_image_unfocused', this.unsetViewingOrientedImage2);
+
+        if (this.parentSource instanceof GeometryLayer) {
+            this.domElement.removeEventListener('pointerup', this.handleGeometrySourcePointerUp2);
+        }
+    }
+
+    initialize() {
         this.setViewingImage3602 = this.setViewingImage360.bind(this);
         this.unsetViewingImage3602 = this.unsetViewingImage360.bind(this);
         this.setViewingOrientedImage2 = this.setViewingOrientedImage.bind(this);
@@ -65,6 +79,7 @@ export class Draw extends Interaction {
     }
 
     remove() {
+        this.removeEventListeners();
         if (this.drawHelper) this.drawHelper.clear();
     }
 

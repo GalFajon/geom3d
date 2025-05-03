@@ -67,8 +67,6 @@ export class Cursor {
         this.position = [0, 0, 0];
         this.type = 'Cursor';
 
-        this.domElement = viewer.renderer.domElement;
-
         this.updateOwnPosition = true;
         this.movedMouse = false;
         this.snapped = false;
@@ -98,6 +96,7 @@ export class Cursor {
     }
 
     initializeEvents(view) {
+        this.domElement = viewer.renderer.domElement;
         this.view = view;
 
         this.domElement.addEventListener('mousemove', (event) => {

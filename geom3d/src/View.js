@@ -4,6 +4,7 @@ import { CSS2DRenderer, CSS2DObject } from "./three/CSS2DRenderer.js";
 import { Draw } from "./interactions/Draw.js";
 import { OverlayLayer } from "./layers/OverlayLayer.js";
 import { GeometryLayer } from "./layers/GeometryLayer.js";
+import { Vector3 } from "../public/dependencies/potree/build/libs/three.js/build/three.module.js";
 
 export class View {
     static cursor = new Cursor();
@@ -20,22 +21,25 @@ export class View {
     constructor(config) {
         if (config.layers) this.layers = config.layers;
         if (config.interactions) this.interactions = config.interactions;
+    }
 
+    async initialize() {
+        viewer.renderer.domElement.parentElement.appendChild(View.overlayRenderer.domElement);
+
+        View.cursor.attachToScene(View.overlayScene);
         View.cursor.initializeEvents(this);
 
         let container = document.getElementById('potree_render_area').getBoundingClientRect();
         View.overlayRenderer.setSize(container.width, container.height);
+
+        for (let interaction of this.interactions) interaction.initialize();
+        for (let layer of this.layers) await layer.attach();
 
         window.addEventListener('resize', (e) => {
             let container = document.getElementById('potree_render_area').getBoundingClientRect();
             viewer.renderer.setSize(container.width, container.height);
             View.overlayRenderer.setSize(container.width, container.height);
         })
-    }
-
-    async initialize() {
-        for (let interaction of this.interactions) interaction.initialize();
-        for (let layer of this.layers) await layer.attach();
 
         this.everyFrame();
     }
@@ -43,6 +47,18 @@ export class View {
     async addLayer(layer) {
         this.layers.push(layer);
         await layer.attach();
+    }
+
+    addInteraction(interaction) {
+        this.interactions.push(interaction);
+        interaction.initialize();
+    }
+
+    removeInteraction(interaction) {
+        if (this.interactions.indexOf(interaction) > -1) {
+            interaction.remove();
+            this.interactions.splice(this.interactions.indexOf(interaction),1);
+        }
     }
 
     removeLayer(layer) {
@@ -73,7 +89,8 @@ export class View {
     center() {
         let bbox = new THREE.Box3();
 
-        for (let layer of this.layers) bbox.union(layer.bbox());
+        if (this.layers.length > 0) for (let layer of this.layers) bbox.union(layer.bbox());
+        else bbox = new THREE.Box3(new Vector3(0, 0, 0), new Vector3(10, 10, 10));
 
         this.zooomToBbox(bbox);
     }
@@ -114,7 +131,8 @@ export class View {
 
             if (layer instanceof GeometryLayer) {
                 Cursor.raycaster.params.Points.threshold = scale;
-                layer.pointscloud.material.size = scale;
+
+                for (let value of layer.pointscloud.values()) value.material.size = scale;
             }
         }
     }
@@ -135,6 +153,3 @@ export class View {
         }
     }
 }
-
-View.cursor.attachToScene(View.overlayScene);
-viewer.renderer.domElement.parentElement.appendChild(View.overlayRenderer.domElement);

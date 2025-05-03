@@ -1,8 +1,9 @@
 'use strict';
 
 import * as THREE from '../../public/dependencies/potree/build/libs/three.js/build/three.module.js';
+import { EarthControls } from '../../../potree/src/navigation/EarthControls.js';
 
-export class NoCloudControls extends Potree.EarthControls {
+export class NoCloudControls extends EarthControls {
     constructor(viewer) {
         super(viewer);
 

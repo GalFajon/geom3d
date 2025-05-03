@@ -8,6 +8,7 @@ import { Line } from '../geometry/Line.js';
 import { Polygon } from '../geometry/Polygon.js';
 
 export class Modify extends Interaction {
+    type = "Modify"
 
     constructor(config) {
         super(config);
@@ -17,7 +18,7 @@ export class Modify extends Interaction {
         this.clickRange = 0.5;
 
         if (config) {
-            if (config.source) this.parentSource = config.source;
+            if (config.layer) this.parentSource = config.layer;
             if (config.target) this.target = config.target;
             if (config.button) this.button = config.button;
             if (config.clickRange) this.clickRange = config.clickRange;
@@ -44,13 +45,22 @@ export class Modify extends Interaction {
         }
     }
 
-    async initialize() {
+    removeEventListeners() {
+        if (this.parentSource instanceof GeometryLayer) {
+            this.domElement.removeEventListener('pointerup', this.handleGeometrySourcePointerUp);
+            this.domElement.removeEventListener('mousemove', this.handleGeometrySourceMouseMove);
+        }
+    }
+
+    initialize() {
         this.handleGeometrySourcePointerUp = this.handleGeometrySourcePointerUp.bind(this);
         this.handleGeometrySourceMouseMove = this.handleGeometrySourceMouseMove.bind(this);
         this.addEventListeners();
     }
 
     remove() {
+        this.removeEventListeners();
+
         this.selectedObject = undefined;
         this.selectedMeasurement = undefined;
         this.selectedVector = {
@@ -287,10 +297,12 @@ export class Modify extends Interaction {
             intersects.push(...this.raycaster.intersectObjects(this.parentSource.models, true));
         }
         if (this.parentSource instanceof GeometryLayer && this.parentSource.pointscloud) {
-            if (this.parentSource.pointscloud && this.parentSource.points.length > 0) {
-                let pointIntersects = this.raycaster.intersectObject(this.parentSource.pointscloud, true);
-                for (let intersect of pointIntersects) {
-                    intersects.push({ object: { userData: this.parentSource.points[intersect.index] }, point: intersect.point, distance: intersect.distance });
+            for (let [key,value] of this.parentSource.pointscloud.entries()) {
+                if (this.parentSource.pointscloud[key] && this.parentSource.points[key].length > 0) {
+                    let pointIntersects = this.raycaster.intersectObject(this.parentSource.pointscloud[key], true);
+                    for (let intersect of pointIntersects) {
+                        intersects.push({ object: { userData: this.parentSource.points[intersect.index] }, point: intersect.point, distance: intersect.distance });
+                    }
                 }
             }
         }

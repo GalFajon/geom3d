@@ -7,6 +7,7 @@ import { Polygon } from '../geometry/Polygon.js';
 import { Line } from '../geometry/Line.js';
 
 export class Snap extends Interaction {
+    type = "Snap"
     static pointMaterial = new THREE.PointsMaterial({ color: '#282828', size: 0.1, transparent: true, opacity: 0 });
 
     constructor(config) {
@@ -15,7 +16,7 @@ export class Snap extends Interaction {
         this.parentSources = [];
 
         if (config) {
-            if (config.sources) this.parentSources = config.sources;
+            if (config.layers) this.parentSources = config.layers;
             if (config.target) this.target = config.target;
         }
 
@@ -45,6 +46,14 @@ export class Snap extends Interaction {
     }
 
     remove() {
+        for (let source of this.parentSources) {
+            if (source instanceof GeometryLayer) {
+                source.removeEventListener('modifyend', this.generateSnaps2);
+                source.removeEventListener('added', this.generateSnaps2);
+                source.removeEventListener('removed', this.generateSnaps2);
+            }
+        }
+
         this.clearSnapPoints();
         this.clearSnapLines();
     }
