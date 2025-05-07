@@ -6,6 +6,7 @@ import { PointcloudLayer } from "./src/layers/PointcloudLayer";
 import { GeometryLayer } from "./src/layers/GeometryLayer";
 import { OverlayLayer } from "./src/layers/OverlayLayer";
 import { GLTFLayer } from './src/layers/GLTFLayer';
+import { IFCLayer } from "./src/layers/IFCLayer";
 
 // overlay
 import { Overlay } from './src/overlay/Overlay';
@@ -72,7 +73,7 @@ async function initializeViewer(config) {
 
 // add namespaces
 export {
-    PointcloudLayer, GeometryLayer, OverlayLayer, GLTFLayer,
+    PointcloudLayer, GeometryLayer, OverlayLayer, GLTFLayer, IFCLayer,
     Overlay,
     Line, Polygon, Point,
     Draw, Snap, Modify, Select,

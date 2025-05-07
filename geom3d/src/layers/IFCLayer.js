@@ -1,17 +1,20 @@
 import { THREE, viewer } from "../misc/DependencyManager";
 import { Layer } from "./Layer";
 
-import { GLTFLoader } from '../three/gltf/GLTFLoader';
+import * as OBC from "@thatopen/components";
 
-export class GLTFLayer extends Layer {
+const components = new OBC.Components();
+
+export class IFCLayer extends Layer {
     visible = true;
     urls = [];
     models = [];
     attached = false;
 
-    type = "GLTFLayer"
+    type = "IFCLayer"
 
-    static loader = new GLTFLoader();
+    fragments = components.get(OBC.FragmentsManager);
+    fragmentIfcLoader = components.get(OBC.IfcLoader);
 
     constructor(config) {
         super(config);
@@ -20,6 +23,12 @@ export class GLTFLayer extends Layer {
     }
 
     async attach() {
+        await this.fragmentIfcLoader.setup();
+        this.fragmentIfcLoader.settings.wasm = {
+            path: "https://unpkg.com/web-ifc@0.0.66/",
+            absolute: true,
+        };
+
         for (let url of this.urls) await this.add(url);
         this.attached = true;
     }
@@ -32,22 +41,16 @@ export class GLTFLayer extends Layer {
     }
 
     async add(url) {
-        let ref = this;
+        return new Promise(async (resolve, reject) => {
+            const file = await fetch(url);
+            const data = await file.arrayBuffer();
+            const buffer = new Uint8Array(data);
+            const model = await this.fragmentIfcLoader.load(buffer);
+            
+            model.rotation.x = Math.PI / 2;
 
-        return new Promise((resolve, reject) => {
-            GLTFLayer.loader.load(
-                url,
-                function (gltf) {
-                    ref.models.push(gltf.scene);
-                    viewer.scene.scene.add(gltf.scene);
-                    resolve();
-                },
-                function (xhr) { },
-                function (error) {
-                    console.log(error);
-                    throw 'Error loading gltf.';
-                }
-            );
+            this.models.push(model);
+            viewer.scene.scene.add(model);
         })
     }
 
@@ -82,7 +85,7 @@ export class GLTFLayer extends Layer {
         let bbox = new THREE.Box3();
 
         for (let model of this.models) {
-            for (let child of model.children) if (child.geometry && child.geometry.boundingBox) {
+            for (let child of model.children) {
                 bbox.union(child.geometry.boundingBox);
             }
         }

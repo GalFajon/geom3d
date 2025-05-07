@@ -32,6 +32,9 @@ export class View {
         let container = document.getElementById('potree_render_area').getBoundingClientRect();
         View.overlayRenderer.setSize(container.width, container.height);
 
+        const light = new THREE.AmbientLight();
+        viewer.scene.scene.add( light );
+        
         for (let interaction of this.interactions) interaction.initialize();
         for (let layer of this.layers) await layer.attach();
 

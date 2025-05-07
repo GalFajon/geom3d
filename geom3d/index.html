@@ -28,7 +28,7 @@
         </div>
 
         <script type="module">
-            import { initialize, setView, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, OverlayLayer, Overlay, GLTFLayer } from './geom3d.js';
+            import { initialize, setView, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, OverlayLayer, Overlay, GLTFLayer, IFCLayer } from './geom3d.js';
 
             async function main() {
                 await initialize({
@@ -37,9 +37,9 @@
                     }
                 })
 
-                let layer = new PointcloudLayer({
+                let layer = new IFCLayer({
                     urls: [ 
-                        '/pointclouds/fields/cloud.js'
+                        'https://thatopen.github.io/engine_components/resources/small.ifc'
                     ]
                 });
 

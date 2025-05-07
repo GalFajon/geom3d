@@ -8,6 +8,10 @@ export default defineConfig({
             '/pointclouds': {
                 target: 'http://localhost:3000',
                 changeOrigin: true
+            },
+            '/gltfs': {
+                target: 'http://localhost:3000',
+                changeOrigin: true
             }
         }
     },
