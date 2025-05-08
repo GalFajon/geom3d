@@ -6,9 +6,12 @@ import * as OBC from "@thatopen/components";
 const components = new OBC.Components();
 
 export class IFCLayer extends Layer {
+    static outlineMaterial = new THREE.LineBasicMaterial( { color: 0x000000 } );
+
     visible = true;
     urls = [];
     models = [];
+    outlines = [];
     attached = false;
 
     type = "IFCLayer"
@@ -42,7 +45,7 @@ export class IFCLayer extends Layer {
         this.attached = false;
     }
 
-    // why does the model disappear?
+    // why does the model clip weirdly?
     correctModelAxis(model) {
         let offset = (new THREE.Vector3()).setFromMatrixPosition(model.coordinationMatrix);
 
@@ -61,6 +64,7 @@ export class IFCLayer extends Layer {
 
             this.models.push(model);
             viewer.scene.scene.add(model);
+
             resolve();
         })
     }
@@ -71,7 +75,10 @@ export class IFCLayer extends Layer {
         if (this.models.indexOf(model) > -1) {
             let i = this.models.indexOf(model);
 
+            for (let outline of this.outlines[i]) viewer.scene.scene.remove(outline);
+
             if (removeFromArray) {
+                this.outlines.splice(i, 1);
                 this.models.splice(i, 1);
                 this.urls.splice(i, 1);
             }

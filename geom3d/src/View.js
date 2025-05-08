@@ -29,9 +29,19 @@ export class View {
         let container = document.getElementById('potree_render_area').getBoundingClientRect();
         View.overlayRenderer.setSize(container.width, container.height);
 
-        const light = new THREE.AmbientLight();
+        const light = new THREE.AmbientLight(0xffffff, 0.8);
         viewer.scene.scene.add( light );
         
+        const directionalLight = new THREE.DirectionalLight( 0x404040, 0.5);
+        directionalLight.position.set(1,0,1);
+
+        viewer.scene.scene.add( directionalLight );
+
+        const directionalLight2 = new THREE.DirectionalLight( 0x404040, 0.5);
+        directionalLight2.position.set(1,0,-1);
+
+        viewer.scene.scene.add( directionalLight2 );
+
         for (let interaction of this.interactions) interaction.initialize();
         for (let layer of this.layers) await layer.attach();
 
