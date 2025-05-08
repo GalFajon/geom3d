@@ -34,6 +34,12 @@ export class Select extends Interaction {
         }
     }
 
+    remove() {
+        if (this.parentSource instanceof GeometryLayer) {
+            this.domElement.removeEventListener('pointerup', this.handleGeometrySourcePointerUp);
+        }
+    }
+
     async initialize() {
         this.handleGeometrySourcePointerUp = this.handleGeometrySourcePointerUp.bind(this);
         this.addEventListeners();

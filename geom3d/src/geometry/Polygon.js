@@ -10,13 +10,14 @@ export class Polygon extends Geometry {
     vectors = [];
     holes = [];
 
-    constructor(positions, properties) {
-        super(properties);
+    constructor(positions, config = {}) {
+        super(config.properties);
 
         this.vectors = positions[0];
         this.holes = this.getHoles(positions);
 
-        this.material = Polygon.material;
+        if (config && config.material) this.material = config.material;
+        else this.material = Polygon.material;
 
         this.model = new THREE.Mesh(this.generateGeometry(positions), this.material);
         this.model.position.set(positions[0][0][0], positions[0][0][1], positions[0][0][2]);
