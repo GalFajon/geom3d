@@ -4,8 +4,8 @@ class Point extends Geometry {
     type = "Point"
     highlighted = false
     
-    constructor(vectors) {
-        super();
+    constructor(vectors, properties) {
+        super(properties);
         this.vectors = vectors;
     }
 }

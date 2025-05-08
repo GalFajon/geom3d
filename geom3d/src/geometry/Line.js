@@ -16,7 +16,7 @@ export class Line extends Geometry {
         depthWrite: true
     });
 
-    constructor(vectors, config) {
+    constructor(vectors, properties) {
         super();
 
         this.vectors = vectors;

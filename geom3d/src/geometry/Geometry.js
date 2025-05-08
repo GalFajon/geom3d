@@ -1,4 +1,8 @@
 export class Geometry {
     vectors = [];
-    construtor() { }
+    properties = {};
+    
+    construtor(properties) { 
+        if (properties) this.properties = properties;
+    }
 }
