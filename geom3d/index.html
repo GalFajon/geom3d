@@ -39,19 +39,26 @@
 
                 let layer = new IFCLayer({
                     urls: [ 
-                        'https://thatopen.github.io/engine_components/resources/small.ifc'
+                        'https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20221107_most Sava_Sentjakob/Most-Sentjakob_02.ifc'
                     ]
                 });
 
-                let view = new View({
-                    layers: [ layer ]
+                let layer2 = new PointcloudLayer({
+                    urls: [
+                        'https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20221107_most Sava_Sentjakob/metadata.json'
+                    ]
                 });
 
-                setView(view);
-                //view.center();
+                window.layer = layer2;
+
+                let view = new View({
+                    layers: [ layer2 ]
+                });
+
+                await setView(view);
+                view.center();
 
                 window.view = view;
-                window.layer = layer;
             }
 
             main();

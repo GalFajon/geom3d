@@ -62,6 +62,8 @@ export class PointcloudLayer extends Layer {
 
         if (this.pointclouds.indexOf(pointcloud) > -1) {
             let i = this.pointclouds.indexOf(pointcloud);
+            
+            viewer.scene.pointclouds.splice(viewer.scene.pointclouds.indexOf(pointcloud), 1);
 
             if (removeFromArray) {
                 this.pointclouds.splice(i, 1);

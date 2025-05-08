@@ -26,9 +26,6 @@ export class View {
     async initialize() {
         viewer.renderer.domElement.parentElement.appendChild(View.overlayRenderer.domElement);
 
-        View.cursor.attachToScene(View.overlayScene);
-        View.cursor.initializeEvents(this);
-
         let container = document.getElementById('potree_render_area').getBoundingClientRect();
         View.overlayRenderer.setSize(container.width, container.height);
 
@@ -43,6 +40,9 @@ export class View {
             viewer.renderer.setSize(container.width, container.height);
             View.overlayRenderer.setSize(container.width, container.height);
         })
+        
+        View.cursor.attachToScene(View.overlayScene);
+        View.cursor.initializeEvents(this);
 
         this.everyFrame();
     }

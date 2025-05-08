@@ -25,9 +25,11 @@ export class IFCLayer extends Layer {
     async attach() {
         await this.fragmentIfcLoader.setup();
         this.fragmentIfcLoader.settings.wasm = {
-            path: "https://unpkg.com/web-ifc@0.0.66/",
-            absolute: true,
+            path: "/",
+            absolute: false,
         };
+
+        this.fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
 
         for (let url of this.urls) await this.add(url);
         this.attached = true;
@@ -40,22 +42,31 @@ export class IFCLayer extends Layer {
         this.attached = false;
     }
 
-    async add(url) {
+    // why does the model disappear?
+    correctModelAxis(model) {
+        let offset = (new THREE.Vector3()).setFromMatrixPosition(model.coordinationMatrix);
+
+        model.position.set(-offset.x, offset.z, -offset.y);
+        model.rotation.x = Math.PI / 2;
+    }
+
+    add(url) {
         return new Promise(async (resolve, reject) => {
             const file = await fetch(url);
             const data = await file.arrayBuffer();
             const buffer = new Uint8Array(data);
             const model = await this.fragmentIfcLoader.load(buffer);
-            
-            model.rotation.x = Math.PI / 2;
+
+            this.correctModelAxis(model);
 
             this.models.push(model);
             viewer.scene.scene.add(model);
+            resolve();
         })
     }
 
     remove(model, removeFromArray = true) {
-        viewer.scene.remove(model)
+        viewer.scene.scene.remove(model)
 
         if (this.models.indexOf(model) > -1) {
             let i = this.models.indexOf(model);
@@ -85,9 +96,14 @@ export class IFCLayer extends Layer {
         let bbox = new THREE.Box3();
 
         for (let model of this.models) {
+            let modelBbox = new THREE.Box3();
+
             for (let child of model.children) {
-                bbox.union(child.geometry.boundingBox);
+                modelBbox.union(child.geometry.boundingBox);
             }
+
+            modelBbox.translate(model.position);
+            bbox.union(modelBbox);
         }
 
         return bbox.expandByScalar(0.05);

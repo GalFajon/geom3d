@@ -3,6 +3,8 @@ import { THREE, viewer, Potree } from "./misc/DependencyManager";
 import { Snap } from "./interactions/Snap.js";
 import { PointcloudLayer } from "./layers/PointcloudLayer.js";
 import { SnapLine } from "./interactions/helpers/SnapLine.js";
+import { IFCLayer } from "./layers/IFCLayer.js";
+import { GeometryLayer } from "./layers/GeometryLayer.js";
 
 export class Cursor {
 
@@ -199,7 +201,7 @@ export class Cursor {
 
                 let distance = (targetZ - viewer.scene.getActiveCamera().clone().position.z) / vector.z;
                 let position = (viewer.scene.getActiveCamera().clone().position).add(vector.multiplyScalar(distance));
-
+                
                 this.mousePosition = [position.x, position.y, position.z];
                 this.position = [position.x, position.y, position.z];
                 this.updateModelPosition();
@@ -221,7 +223,7 @@ export class Cursor {
             if (!this.snapped) {
 
                 let I = undefined;
-
+                
                 if (viewer.scene.pointclouds.length > 0) {
                     I = Potree.Utils.getMousePointCloudIntersection(
                         e,
@@ -235,8 +237,8 @@ export class Cursor {
                 const raycastList = [];
 
                 for (let source of view.layers) {
-                    if ((source instanceof PointcloudLayer || source instanceof GeometryLayer) && source.Models) {
-                        for (let model of source.Models) raycastList.push(model);
+                    if ((source instanceof PointcloudLayer || source instanceof GeometryLayer || source instanceof IFCLayer) && source.models) {
+                        for (let model of source.models) raycastList.push(model);
                     }
                 }
 
@@ -258,10 +260,9 @@ export class Cursor {
                 this.mousePosition = [position.x, position.y, position.z];
                 this.position = [position.x, position.y, position.z];
                 this.updateModelPosition();
-
             }
         }
-        catch (err) { }
+        catch (err) { console.log(err); }
     }
 
     getMouseIntersect(mouse, list) {
