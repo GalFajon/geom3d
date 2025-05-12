@@ -28,7 +28,7 @@
         </div>
 
         <script type="module">
-            import { initialize, setView, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, OverlayLayer, Overlay, GLTFLayer, IFCLayer } from './geom3d.js';
+            import { initialize, setView, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, OverlayLayer, Overlay, GLTFLayer, IFCLayer, GeoJSON } from './geom3d.js';
 
             async function main() {
                 await initialize({
@@ -37,22 +37,25 @@
                     }
                 })
 
-                let layer = new IFCLayer({
-                    urls: [ 
-                        'https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20221107_most Sava_Sentjakob/Most-Sentjakob_02.ifc'
+                let layer = new GeometryLayer({
+                    geometries: [
+                        new Line([ [0,0,0], [10,10,10] ]),
+                        new Polygon([ [ [0,0,0], [10,0,0], [10,10,0], [0,10, 0] ], [ [3,3,0], [7,3,0], [7,7,0], [3,7,0] ] ]),
+                        new Point([0,0,0]),
+                        new Point([10,10,10])
                     ]
                 });
 
-                let layer2 = new PointcloudLayer({
-                    urls: [
-                        'https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20221107_most Sava_Sentjakob/metadata.json'
-                    ]
+                
+                let layer2 = new GeometryLayer({
+                    geometries: GeoJSON.import(GeoJSON.export(layer))
                 });
+
 
                 window.layer = layer;
 
                 let view = new View({
-                    layers: [ layer ]
+                    layers: [ layer2 ]
                 });
 
                 await setView(view);

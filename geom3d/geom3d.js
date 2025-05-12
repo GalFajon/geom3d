@@ -25,6 +25,7 @@ import { Select } from "./src/interactions/Select";
 // support classes
 import { View } from "./src/View";
 import { NoCloudControls } from "./src/misc/noCloudControls";
+import { GeoJSON } from './src/misc/GeoJSON';
 
 let currentView = null;
 
@@ -77,5 +78,6 @@ export {
     Overlay,
     Line, Polygon, Point,
     Draw, Snap, Modify, Select,
-    View
+    View,
+    GeoJSON
 }
