@@ -118,13 +118,10 @@ export class Polygon extends Geometry {
     }
 
     update() {
-        console.log(this.vectors, this.holes);
         let geometry = this.generateGeometry([this.vectors, ...this.holes]);
 
         this.model.geometry.dispose();
         this.model.geometry = geometry;
-        this.model.position.set(this.vectors[0][0], this.vectors[0][1], this.vectors[0][2]);
-        
-        console.log(this.model.geometry);
+        this.model.position.set(this.vectors[0][0], this.vectors[0][1], this.vectors[0][2]);        
     }
 }
