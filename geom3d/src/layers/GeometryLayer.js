@@ -5,6 +5,7 @@ import { Point } from "../geometry/Point";
 import { THREE, viewer } from "../misc/DependencyManager";
 import { Layer } from "./Layer";
 import { LineMaterial } from '../three/fatlines/LineMaterial.js'
+import { View } from "../View.js";
 
 export class GeometryLayer extends Layer {
     static meshSelectionMaterial = new THREE.MeshBasicMaterial( {color: 'lightgreen', side: THREE.DoubleSide, transparent: false } );
@@ -21,6 +22,8 @@ export class GeometryLayer extends Layer {
     points = new Map()
     pointscloud = new Map()
     pointvertices = new Map()
+    
+    depthTesting = true;
 
     type = "GeometryLayer"
 
@@ -37,6 +40,40 @@ export class GeometryLayer extends Layer {
         this.pointvertices.set('highlighted', []);
 
         this.geometries = config.geometries;
+    }
+
+    disableDepthTesting() {
+        if (this.depthTesting) {
+            for (let model of this.models) {
+                viewer.scene.scene.remove(model);
+                View.overlayScene.add(model);
+            }
+
+            console.log(this.pointscloud);
+
+            for (let pointscloud of this.pointscloud.values()) {
+                viewer.scene.scene.remove(pointscloud);
+                View.overlayScene.add(pointscloud);
+            }
+
+            this.depthTesting = false;
+        }
+    }
+
+    enableDepthTesting() {
+        if (!this.depthTesting) {
+            for (let model of this.models) {
+                View.overlayScene.remove(model);
+                viewer.scene.scene.add(model);
+            }
+
+            for (let pointscloud of this.pointscloud.values()) {
+                View.overlayScene.remove(pointscloud);
+                viewer.scene.scene.add(pointscloud);
+            }
+
+            this.depthTesting = true;
+        }
     }
 
     updatePoints() {
@@ -132,7 +169,9 @@ export class GeometryLayer extends Layer {
 
         if (geometry instanceof Line || geometry instanceof Polygon) {
             this.models.push(geometry.model);
-            viewer.scene.scene.add(geometry.model);
+
+            if (this.depthTesting) viewer.scene.scene.add(geometry.model);
+            else View.overlayScene.add(geometry.model);
         }
         else if (geometry instanceof Point) {
             if (geometry.highlighted) this.points.get('highlighted').push(geometry);

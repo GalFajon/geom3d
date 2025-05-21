@@ -12,8 +12,8 @@ export class View {
     static overlayScene = new THREE.Scene();
     static overlayRenderer = new CSS2DRenderer();
 
-    static pointMinScale = 0.01;
-    static pointMaxScale = 10;
+    static pointMinScale = 0.1;
+    static pointMaxScale = 3;
 
     layers = [];
     interactions = [];

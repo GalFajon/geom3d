@@ -37,30 +37,20 @@
                     }
                 })
 
-                let poly = new Polygon([ [ [0,0,0], [10,0,0], [10,10,0], [0,10, 0] ] ]);
-                let poly2 = new Polygon([ [ [3,3,0], [7,3,0], [7,7,0], [3,7,0] ] ]);
-
                 let layer = new GeometryLayer({
-                    geometries: [
-                        new Line([ [0,0,0], [10,10,10] ]),
-                        poly,
-                        new Point([0,0,0]),
-                        new Point([10,10,10])
-                    ]
+                    geometries: []
                 });
 
                 window.layer = layer;
                 let draw = new Draw({ layer: layer, type: 'Point' })
 
                 let view = new View({
-                    layers: [ layer ],
+                    layers: [ layer, new PointcloudLayer({ urls: [ 'https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20221107_most Sava_Sentjakob/metadata.json' ] }) ],
                     interactions: [ draw ]
                 });
 
-                poly.carveHole(poly2);
-
                 draw.addEventListener('drawend', (e) => {
-                    poly.fillHole(e.detail[0].vectors);
+                    for (let point of e.detail) layer.add(point);
                 })
                 
                 await setView(view);
