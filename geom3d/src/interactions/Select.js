@@ -27,7 +27,7 @@ export class Select extends Interaction {
 
     addEventListeners() {
         if (this.parentSource instanceof GeometryLayer) {
-            this.domElement.addEventListener('pointerup', this.handleGeometrySourcePointerUp);
+            this.domElement.addEventListener('pointerup', this.handleGeometrySourcePointerUp2);
         }
         else {
             console.warn("The assigned source" + this.parentSource.type + " is incompatible with the interaction" + this.type + ".")
@@ -36,19 +36,20 @@ export class Select extends Interaction {
 
     remove() {
         if (this.parentSource instanceof GeometryLayer) {
-            this.domElement.removeEventListener('pointerup', this.handleGeometrySourcePointerUp);
+            if (this.highlight && this.selectedObject) this.parentSource.removeGeometryHighlight(this.selectedObject);
+            this.domElement.removeEventListener('pointerup', this.handleGeometrySourcePointerUp2);
         }
     }
 
     async initialize() {
-        this.handleGeometrySourcePointerUp = this.handleGeometrySourcePointerUp.bind(this);
+        this.handleGeometrySourcePointerUp2 = this.handleGeometrySourcePointerUp.bind(this);
         this.addEventListeners();
     }
 
     setActive(active) {
         if (active == true) { this.active = true;}
         else { 
-            if (this.highlight) this.parentSource.removeGeometryHighlight(this.selectedObject);
+            if (this.highlight && this.selectedObject) this.parentSource.removeGeometryHighlight(this.selectedObject);
             this.selectedObject = undefined; 
             this.active = false; 
         }

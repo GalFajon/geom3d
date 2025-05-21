@@ -3,6 +3,9 @@ import { THREE } from '../misc/DependencyManager.js';
 import { ConvexGeometry } from '../three/convexgeom/ConvexGeometry.js';
 import * as earcut from 'earcut'
 
+import { booleanContains } from "@turf/boolean-contains";
+import * as turf from "@turf/turf";
+
 export class Polygon extends Geometry {
     type = "Polygon"
     static material = new THREE.MeshBasicMaterial({ color: 'purple', side: THREE.DoubleSide });
@@ -74,11 +77,54 @@ export class Polygon extends Geometry {
         return geometry;
     }
 
+    fillHole(position) {
+        for (let i=0; i < this.holes.length; i++) {
+            let poly2 = turf.polygon([ [...this.holes[i], this.holes[i][0]] ]);
+            if (booleanContains(poly2, turf.point(position))) this.holes.splice(i,1);
+        }
+
+        this.update();
+    }
+
+    carveHole(polygon) {
+        let poly1 = null;
+
+        let coords = [ [...this.vectors, this.vectors[0]] ];
+
+        if (this.holes.length > 0) {
+            for (let hole of this.holes) coords.push([...hole, hole[0]]);
+        }
+
+        poly1 = turf.polygon(coords);
+
+        let poly2 = null;
+
+        coords = [ [...polygon.vectors, polygon.vectors[0]] ];
+
+        if (this.holes.length > 0) {
+            for (let hole of polygon.holes) coords.push([...hole, hole[0]]);
+        }
+
+        poly2 = turf.polygon(coords);
+
+        if (booleanContains(poly1, poly2)) {
+            let diff = turf.difference(turf.featureCollection([poly1, poly2]));
+            
+            if (diff) {
+                this.holes.push(polygon.vectors);
+                this.update();
+            }
+        }
+    }
+
     update() {
+        console.log(this.vectors, this.holes);
         let geometry = this.generateGeometry([this.vectors, ...this.holes]);
 
         this.model.geometry.dispose();
         this.model.geometry = geometry;
         this.model.position.set(this.vectors[0][0], this.vectors[0][1], this.vectors[0][2]);
+        
+        console.log(this.model.geometry);
     }
 }

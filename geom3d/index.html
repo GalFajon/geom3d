@@ -37,31 +37,38 @@
                     }
                 })
 
+                let poly = new Polygon([ [ [0,0,0], [10,0,0], [10,10,0], [0,10, 0] ] ]);
+                let poly2 = new Polygon([ [ [3,3,0], [7,3,0], [7,7,0], [3,7,0] ] ]);
+
                 let layer = new GeometryLayer({
                     geometries: [
                         new Line([ [0,0,0], [10,10,10] ]),
-                        new Polygon([ [ [0,0,0], [10,0,0], [10,10,0], [0,10, 0] ], [ [3,3,0], [7,3,0], [7,7,0], [3,7,0] ] ]),
+                        poly,
                         new Point([0,0,0]),
                         new Point([10,10,10])
                     ]
                 });
 
-                
-                let layer2 = new GeometryLayer({
-                    geometries: GeoJSON.import(GeoJSON.export(layer))
-                });
-
-
                 window.layer = layer;
+                let draw = new Draw({ layer: layer, type: 'Point' })
 
                 let view = new View({
-                    layers: [ layer2 ]
+                    layers: [ layer ],
+                    interactions: [ draw ]
                 });
 
+                poly.carveHole(poly2);
+
+                draw.addEventListener('drawend', (e) => {
+                    poly.fillHole(e.detail[0].vectors);
+                })
+                
                 await setView(view);
                 view.center();
 
                 window.view = view;
+
+                //view.removeInteraction(sel)
             }
 
             main();

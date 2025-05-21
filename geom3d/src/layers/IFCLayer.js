@@ -75,10 +75,7 @@ export class IFCLayer extends Layer {
         if (this.models.indexOf(model) > -1) {
             let i = this.models.indexOf(model);
 
-            for (let outline of this.outlines[i]) viewer.scene.scene.remove(outline);
-
             if (removeFromArray) {
-                this.outlines.splice(i, 1);
                 this.models.splice(i, 1);
                 this.urls.splice(i, 1);
             }
