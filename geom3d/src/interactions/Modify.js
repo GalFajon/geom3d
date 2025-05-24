@@ -132,7 +132,7 @@ export class Modify extends Interaction {
                                     if (cursorPos.distanceTo(new THREE.Vector3(x, y, z)) < nearestDistv || nearestDistv === null) {
                                         nearestDistv = cursorPos.distanceTo(new THREE.Vector3(x, y, z));
                                         nearestCoordsv = [x, y, z];
-                                        nearestIndexv = i;
+                                        nearestIndexv = 0;
                                     }
 
                                     if (nearestDistv < this.clickRange) this.selectedVector = { coordinates: nearestCoordsv, index: nearestIndexv, holeIndex: undefined };
@@ -254,7 +254,9 @@ export class Modify extends Interaction {
             if (this.selectedVector.coordinates != undefined && this.selectedVector.index != undefined) {
                 if (this.selectedVector.holeIndex == undefined) {
                     this.selectedVector.coordinates = View.cursor.position;
-                    this.selectedObject.vectors[this.selectedVector.index] = this.selectedVector.coordinates;
+
+                    if (this.selectedObject instanceof Point) this.selectedObject.vectors = this.selectedVector.coordinates;
+                    else this.selectedObject.vectors[this.selectedVector.index] = this.selectedVector.coordinates;
                 }
                 else {
                     this.selectedVector.coordinates = View.cursor.position;

@@ -5,12 +5,13 @@ import { Polygon } from '../../geometry/Polygon.js';
 
 import { LineMaterial } from '../../three/fatlines/LineMaterial.js';
 import { View } from '../../View.js';
+import { Cursor } from '../../Cursor.js';
 
 export class DrawHelper {
 
     static lineMaterial = new LineMaterial({ color: 'blue', linewidth: 5, vertexColors: false, resolution: new THREE.Vector2(1000, 1000), dashed: false, alphaToCoverage: true });
     static meshMaterial = new THREE.MeshBasicMaterial({ color: 'blue', transparent: false });
-    static pointMaterial = new THREE.PointsMaterial({ color: '#0000FF', size: 0.1, depthTest: false, depthWrite: false });
+    static pointMaterial = new THREE.PointsMaterial({ transparent: true, size: 0.5, sizeAttenuation: true, map: Cursor.generateSpriteTexture('blue'), depthTest: false, depthWrite: false })
 
     constructor(config) {
         this.Vectors = [];

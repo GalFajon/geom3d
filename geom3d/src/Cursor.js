@@ -9,7 +9,7 @@ import { GeometryLayer } from "./layers/GeometryLayer.js";
 export class Cursor {
 
     static material = new THREE.SpriteMaterial({ map: Cursor.generateSpriteTexture('black'), depthTest: false, depthWrite: false, transparent: true });
-    static snapMaterial = new THREE.MeshBasicMaterial({ map: Cursor.generateSpriteTexture('white'), depthTest: false, depthWrite: false, transparent: true });
+    static snapMaterial = new THREE.MeshBasicMaterial({ map: Cursor.generateSpriteTexture(null), depthTest: false, depthWrite: false, transparent: true });
 
     static raycaster = new THREE.Raycaster();
 

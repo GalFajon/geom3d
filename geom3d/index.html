@@ -42,11 +42,11 @@
                     'https://projekti.lgb.si/WebPointCloud/IFC/20211110_Marina_Garage_RTC360/Marina_garage_pipes_DX100000_DY460000_DZ300.ifc'
                 ] });
 
-                let geomLayer = new GeometryLayer({ geometries: [ new Polygon([ [ [0,0,0], [10,0,0], [10,10,0], [0,10,0] ] ]) ] });
+                let geomLayer = new GeometryLayer({ geometries: [ new Point([0,0,0]), new Point([10,0,0]), new Point([0,10,0])  ] });
 
                 let view = new View({
                     layers: [ geomLayer ],
-                    interactions: [ new Modify({ layer: geomLayer }), new Snap({ layers: [ geomLayer ] }) ]
+                    interactions: [ new Modify({ layer: geomLayer }), new Snap({ layers: [ geomLayer ] }), new Select({ layer: geomLayer }) ]
                 });
 
                 await setView(view);

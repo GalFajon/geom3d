@@ -6,13 +6,17 @@ import { THREE, viewer } from "../misc/DependencyManager";
 import { Layer } from "./Layer";
 import { LineMaterial } from '../three/fatlines/LineMaterial.js'
 import { View } from "../View.js";
+import { Cursor } from "../Cursor.js";
 
 export class GeometryLayer extends Layer {
     static meshSelectionMaterial = new THREE.MeshBasicMaterial( {color: 'lightgreen', side: THREE.DoubleSide, transparent: false } );
     static lineSelectionMaterial = new LineMaterial( { color: 'lightgreen', linewidth: 5, vertexColors: false, resolution: new THREE.Vector2(1000, 1000), dashed: false, alphaToCoverage: true });
     
-    static pointMaterial = new THREE.PointsMaterial({ color: '#C41E3A', size: 0.5, sizeAttenuation: true });
-    static selectedPointMaterial = new THREE.PointsMaterial({ color: 'lightgreen', size: 0.5, sizeAttenuation: true });
+    //static pointMaterial = new THREE.PointsMaterial({ color: '#C41E3A', size: 0.5, sizeAttenuation: true });
+    //static selectedPointMaterial = new THREE.PointsMaterial({ color: 'lightgreen', size: 0.5, sizeAttenuation: true });
+
+    static pointMaterial = new THREE.PointsMaterial({ transparent: true, size: 0.5, sizeAttenuation: true, map: Cursor.generateSpriteTexture('red') })
+    static selectedPointMaterial = new THREE.PointsMaterial({ transparent: true, size: 0.5, sizeAttenuation: true, map: Cursor.generateSpriteTexture('lightgreen') })
 
     visible = true;
     geometries = [];
@@ -48,8 +52,6 @@ export class GeometryLayer extends Layer {
                 viewer.scene.scene.remove(model);
                 View.overlayScene.add(model);
             }
-
-            console.log(this.pointscloud);
 
             for (let pointscloud of this.pointscloud.values()) {
                 viewer.scene.scene.remove(pointscloud);
