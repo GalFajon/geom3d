@@ -196,8 +196,11 @@ export class Modify extends Interaction {
 
                                     if (this.selectedObject.holes) {
                                         for (let i = 0; i < this.selectedObject.holes.length; i++) {
-                                            for (let j = 1; j < this.selectedObject.holes[i].length; j++) {
-                                                if (this.vectorIsOnLine(this.selectedObject.holes[i][j - 1], this.selectedObject.holes[i][j], point.toArray())) {
+                                            let coords = this.selectedObject.holes[i];
+                                            coords.push(this.selectedObject.holes[i][0]);
+
+                                            for (let j = 1; j < coords.length; j++) {
+                                                if (this.vectorIsOnLine(coords[j - 1], coords[j], point.toArray())) {
                                                     this.selectedObject.holes[i].splice(j, 0, point.toArray());
                                                     this.selectedObject.update();
 
