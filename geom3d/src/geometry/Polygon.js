@@ -3,12 +3,24 @@ import { THREE } from '../misc/DependencyManager.js';
 import { ConvexGeometry } from '../three/convexgeom/ConvexGeometry.js';
 import * as earcut from 'earcut'
 
+import { LineMaterial } from '../three/fatlines/LineMaterial.js';
+import { LineGeometry } from '../three/fatlines/LineGeometry.js';
+import { Line2 } from '../three/fatlines/Line2.js';
+
 import { booleanContains } from "@turf/boolean-contains";
 import * as turf from "@turf/turf";
 
 export class Polygon extends Geometry {
     type = "Polygon"
     static material = new THREE.MeshBasicMaterial({ color: 'purple', side: THREE.DoubleSide });
+    static lineMaterial = new LineMaterial({
+        color: 0x000000,
+        linewidth: 1,
+        resolution: new THREE.Vector2(1000, 1000),
+        dashed: false,
+        depthTest: true,
+        depthWrite: true
+    });
 
     vectors = [];
     holes = [];
@@ -25,6 +37,37 @@ export class Polygon extends Geometry {
         this.model = new THREE.Mesh(this.generateGeometry(positions), this.material);
         this.model.position.set(positions[0][0][0], positions[0][0][1], positions[0][0][2]);
         this.model.userData = this;
+
+        this.surroundingLines = this.generateSurroundingLines(positions);
+        for (let surroundingLine of this.surroundingLines) this.model.add(surroundingLine);
+    }
+
+    generateSurroundingLines(positions) {
+        let surroundingLines = [];
+        let localPositions = this.localizeVectors(positions);
+
+        for (let positionSet of localPositions) {
+            let flatPositions = [];
+
+            for (let [x,y,z] of positionSet) flatPositions.push(x,y,z);
+            flatPositions.push(positionSet[0][0], positionSet[0][1], positionSet[0][2]);
+
+            let geometry = new LineGeometry();
+            geometry.setPositions(flatPositions);
+    
+            let material = Polygon.lineMaterial;
+    
+            let model = new Line2( geometry, material );
+            model.computeLineDistances();
+            model.scale.set( 1, 1, 1 );
+
+            model.userData.isPolygonSurroundingLine = true;
+            model.userData.parent = this;
+    
+            surroundingLines.push(model);
+        }
+
+        return surroundingLines;
     }
 
     getHoles(positions) {
@@ -122,6 +165,13 @@ export class Polygon extends Geometry {
 
         this.model.geometry.dispose();
         this.model.geometry = geometry;
-        this.model.position.set(this.vectors[0][0], this.vectors[0][1], this.vectors[0][2]);        
+        this.model.position.set(this.vectors[0][0], this.vectors[0][1], this.vectors[0][2]);
+        
+        for (let surroundingLine of this.surroundingLines) surroundingLine.geometry.dispose();
+        for (let surroundingLine of this.surroundingLines) this.model.remove(surroundingLine);
+
+        this.surroundingLines = this.generateSurroundingLines([this.vectors, ...this.holes]);
+        
+        for (let surroundingLine of this.surroundingLines) this.model.add(surroundingLine);
     }
 }

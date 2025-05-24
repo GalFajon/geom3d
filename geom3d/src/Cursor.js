@@ -84,6 +84,8 @@ export class Cursor {
         this.model.userData = this;
 
         this.snapDistance = 1;
+        this.ifcSnapDistance = 0.1;
+        this.ifcVertexDistanceBuffer = 0.1;
         this.pointSnapDistance = 0.3;
 
         this.view = undefined;
@@ -127,10 +129,20 @@ export class Cursor {
                 -(e.layerY / this.domElement.getBoundingClientRect().height) * 2 + 1
             );
 
+            let vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+            vector.unproject(viewer.scene.getActiveCamera().clone());
+            vector.sub(viewer.scene.getActiveCamera().clone().position).normalize();
+
+            let targetZ = this.position[2];
+
+            let distance = (targetZ - viewer.scene.getActiveCamera().clone().position.z) / vector.z;
+            let position = (viewer.scene.getActiveCamera().clone().position).add(vector.multiplyScalar(distance));
+            
             let snapRaycastList = [];
             let snapPointRaycastList = []
             let snapPointClouds = [];
-            let snapPointList = []
+            let snapPointList = [];
+            let snapIFCs = [];
 
             for (let interaction of view.interactions) {
                 if (interaction instanceof Snap) {
@@ -139,7 +151,11 @@ export class Cursor {
                             snapPointList.push(interaction.snapPoints);
                             snapPointRaycastList.push(interaction.snapPointCloud);
                             snapRaycastList.push(...interaction.snapLines.map(line => line.model));
-                            for (let source of interaction.parentSources) if (source instanceof PointcloudLayer) snapPointClouds.push(...source.pointclouds);
+
+                            for (let source of interaction.parentSources) {
+                                if (source instanceof IFCLayer) for (let model of source.models) snapIFCs.push(model);
+                                if (source instanceof PointcloudLayer) snapPointClouds.push(...source.pointclouds);
+                            }
                         }
                     }
                 }
@@ -148,6 +164,61 @@ export class Cursor {
             let snappedToPoint = false;
             let snappedToLine = false;
             let snappedToPtcld = false;
+            let snappedToIFC = false;
+
+            // do ifc snapping -> get three nearest vertices to the mouse intersected face and add them as snap points
+            if (snapIFCs.length > 0) {
+                for (let model of snapIFCs) {
+                    let offset = (new THREE.Vector3()).setFromMatrixPosition(model.coordinationMatrix);
+                    let intersects = this.getMouseIntersect(mouse, model.children);
+                    
+                    for (let intersect of intersects) {                
+                        let vA = new THREE.Vector3(
+                            intersect.object.geometry.attributes.position.array[intersect.face.a * 3],
+                            intersect.object.geometry.attributes.position.array[intersect.face.a * 3 + 1],
+                            intersect.object.geometry.attributes.position.array[intersect.face.a * 3 + 2]
+                        );
+
+                        let vB = new THREE.Vector3(
+                            intersect.object.geometry.attributes.position.array[intersect.face.b * 3],
+                            intersect.object.geometry.attributes.position.array[intersect.face.b * 3 + 1],
+                            intersect.object.geometry.attributes.position.array[intersect.face.b * 3 + 2]
+                        );
+                        
+                        let vC = new THREE.Vector3(
+                            intersect.object.geometry.attributes.position.array[intersect.face.c * 3],
+                            intersect.object.geometry.attributes.position.array[intersect.face.c * 3 + 1],
+                            intersect.object.geometry.attributes.position.array[intersect.face.c * 3 + 2]
+                        );
+
+                        vA.set(vA.x, vA.y, vA.z)
+                        vB.set(vB.x, vB.y, vB.z)
+                        vC.set(vC.x, vC.y, vC.z)
+                        
+                        let im = [];
+                        for (let i=0; i < 16; i++) im.push(intersect.object.instanceMatrix.array[intersect.instanceId * 16 + i]);             
+                        let im4 = new THREE.Matrix4().fromArray(im);
+
+                        vA.applyMatrix4(im4);
+                        vA.applyAxisAngle(new THREE.Vector3(1,0,0),Math.PI / 2);
+                        vA.add(new THREE.Vector3(-offset.x, offset.z, -offset.y));
+
+                        vB.applyMatrix4(im4);
+                        vB.applyAxisAngle(new THREE.Vector3(1,0,0),Math.PI / 2);
+                        vB.add(new THREE.Vector3(-offset.x, offset.z, -offset.y));
+
+                        vC.applyMatrix4(im4);
+                        vC.applyAxisAngle(new THREE.Vector3(1,0,0),Math.PI / 2);
+                        vC.add(new THREE.Vector3(-offset.x, offset.z, -offset.y));
+
+                        if (vA.distanceTo(vB) > 1 || vA.distanceTo(vC) > 1) {
+                            if (intersect.point.distanceTo(vA) < this.ifcVertexDistanceBuffer) { this.snapTo([vA.x, vA.y, vA.z], intersect.object); snappedToIFC = true; }
+                            if (intersect.point.distanceTo(vB) < this.ifcVertexDistanceBuffer) { this.snapTo([vB.x, vB.y, vB.z], intersect.object); snappedToIFC = true; }
+                            if (intersect.point.distanceTo(vC) < this.ifcVertexDistanceBuffer) { this.snapTo([vC.x, vC.y, vC.z], intersect.object); snappedToIFC = true; }   
+                        }                 
+                    }
+                }
+            }
 
             for (let i = 0; i < snapPointRaycastList.length; i++) {
                 if (snapPointList[i].length > 0) {
@@ -165,7 +236,7 @@ export class Cursor {
                 }
             }
 
-            if (!snappedToPoint) {
+            if (!snappedToPoint && !snappedToIFC) {
                 let intersected = this.getMouseIntersect(mouse, snapRaycastList);
 
                 if (intersected && intersected[0]) {
@@ -176,7 +247,7 @@ export class Cursor {
                 }
             }
 
-            if (!snappedToPoint && !snappedToLine) {
+            if (!snappedToPoint && !snappedToLine && !snappedToIFC) {
                 let pointcloudIntersection = Potree.Utils.getMousePointCloudIntersection(
                     viewer.inputHandler.mouse,
                     viewer.scene.getActiveCamera(),
@@ -190,18 +261,9 @@ export class Cursor {
                 }
             }
 
-            if (!snappedToPoint && !snappedToPtcld && !snappedToLine) this.unsnap();
+            if (!snappedToPoint && !snappedToPtcld && !snappedToLine && !snappedToIFC) this.unsnap();
 
             if (!this.snapped) {
-                let vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-                vector.unproject(viewer.scene.getActiveCamera().clone());
-                vector.sub(viewer.scene.getActiveCamera().clone().position).normalize();
-
-                let targetZ = this.position[2];
-
-                let distance = (targetZ - viewer.scene.getActiveCamera().clone().position.z) / vector.z;
-                let position = (viewer.scene.getActiveCamera().clone().position).add(vector.multiplyScalar(distance));
-                
                 this.mousePosition = [position.x, position.y, position.z];
                 this.position = [position.x, position.y, position.z];
                 this.updateModelPosition();

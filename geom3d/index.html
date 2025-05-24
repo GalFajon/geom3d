@@ -37,27 +37,22 @@
                     }
                 })
 
-                let layer = new GeometryLayer({
-                    geometries: []
-                });
+                let ifcLayer = new IFCLayer({ urls: [ 
+                    //'http://localhost:3000/ifcs/test/test.ifc'
+                    'https://projekti.lgb.si/WebPointCloud/IFC/20211110_Marina_Garage_RTC360/Marina_garage_pipes_DX100000_DY460000_DZ300.ifc'
+                ] });
 
-                window.layer = layer;
-                let draw = new Draw({ layer: layer, type: 'Point' })
+                let geomLayer = new GeometryLayer({ geometries: [ new Polygon([ [ [0,0,0], [10,0,0], [10,10,0], [0,10,0] ] ]) ] });
 
                 let view = new View({
-                    layers: [ layer, new PointcloudLayer({ urls: [ 'https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20221107_most Sava_Sentjakob/metadata.json' ] }) ],
-                    interactions: [ draw ]
+                    layers: [ geomLayer ],
+                    interactions: [ new Modify({ layer: geomLayer }), new Snap({ layers: [ geomLayer ] }) ]
                 });
 
-                draw.addEventListener('drawend', (e) => {
-                    for (let point of e.detail) layer.add(point);
-                })
-                
                 await setView(view);
                 view.center();
 
                 window.view = view;
-
                 //view.removeInteraction(sel)
             }
 
