@@ -121,19 +121,19 @@ export class View {
             View.cursor.model.scale.set(scale, scale, scale);
         }
 
-        //let distance = viewer.scene.view.position.z - View.cursor.model.position.z;
-        //let pr = Potree.Utils.projectedRadius(1, viewer.scene.getActiveCamera(), distance, viewer.clientwidth, viewer.renderer.domElement.clientHeight);
-        //let scale = 30 / pr;
+        let distance = viewer.scene.view.position.z - View.cursor.model.position.z;
+        let pr = Potree.Utils.projectedRadius(1, viewer.scene.getActiveCamera(), distance, viewer.clientwidth, viewer.renderer.domElement.clientHeight);
+        let scale = 30 / pr;
 
+        // Refractor this to apply to shader too
         //if (scale < View.pointMinScale) scale = View.pointMinScale;
-        //if (scale > View.pointMaxScale) scale = View.pointMaxScale;
+        if (scale > View.pointMaxScale) scale = View.pointMaxScale;
 
-        /*
-        for (let interaction of this.interactions) {
-            if (interaction instanceof Draw) {
-                interaction.drawHelper.pointscloud.material.size = scale;
-            }
-        }
+        //for (let interaction of this.interactions) {
+        //    if (interaction instanceof Draw) {
+        //        interaction.drawHelper.pointscloud.material.size = scale;
+        //    }
+        //}
 
         for (let layer of this.layers) {
             if (layer instanceof OverlayLayer && layer.UseVisibilityDistance) {
@@ -145,10 +145,9 @@ export class View {
 
             if (layer instanceof GeometryLayer) {
                 Cursor.raycaster.params.Points.threshold = scale;
-                for (let value of layer.pointscloud.values()) value.material.size = scale;
+                //for (let value of layer.pointscloud.values()) value.material.size = scale;
             }
         }
-        */
     }
 
     everyFrame() {

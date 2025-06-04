@@ -174,7 +174,8 @@ export class GeometryLayer extends Layer {
         }
 
         for (const [key, value] of this.pointscloud) {
-            viewer.scene.scene.remove(value);
+            if (this.depthTesting) viewer.scene.scene.remove(value);
+            else View.overlayScene.remove(value);
 
             if (this.pointvertices.get(key).length > 0) {
                 value.geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.pointvertices.get(key), 3));
@@ -182,7 +183,9 @@ export class GeometryLayer extends Layer {
                 value.geometry.verticesNeedUpdate = true;
                 value.geometry.computeBoundingSphere();
                 value.position.set(...rootCoords);
-                viewer.scene.scene.add(value);
+                
+                if (this.depthTesting) viewer.scene.scene.add(value);
+                else View.overlayScene.add(value);
             }
             else {
                 value.geometry.dispose();
