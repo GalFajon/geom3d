@@ -28,7 +28,13 @@
         </div>
 
         <script type="module">
-            import { initialize, setView, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, OverlayLayer, Overlay, GLTFLayer, IFCLayer, GeoJSON } from './geom3d.js';
+            import { initialize, setView, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, OverlayLayer, Overlay, IFCLayer, GeoJSON } from './geom3d.js';
+
+            // http://127.0.0.1:5500/index.html?pointcloudUrl=https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20220219_viadukt_Bohinjska_Bela/metadata.json&DN=2022-0052
+            
+            let params = new URLSearchParams(document.location.search);
+            let pointcloudUrl = params.get("pointcloudUrl");
+            let DN = params.get("DN");
 
             async function main() {
                 await initialize({
@@ -37,26 +43,107 @@
                     }
                 })
 
-                let geomLayer = new GeometryLayer({ geometries: [ 
-                    new Point([0,0,0]),
-                    new Point([10,0,0]), 
-                    new Point([10,10,0]), 
-                    new Point([0,10,0]),
-                    new Point([5,5,10])
-                ]});
+                let ptcldLayer = new PointcloudLayer({ urls: [ pointcloudUrl ] })
+                let geomLayer = new GeometryLayer({ geometries: [] });
 
-                let draw = new Select({ layer: geomLayer })
+                let draw = new Draw({ layer: geomLayer, type: 'Point' });
+                let del = new Select({ layer: geomLayer });
+
+                fetch(`https://sdms.lgb.si/function/API_GetTocDN/0.json?dn=${DN}&apikey=0552BF4EC2731BFD7DE5493CA5585108B6C2711A`).then( async (response) => {
+                    let features = (await response.json()).features;
+
+                    for (let feature of features) {
+                        if (feature.properties.Koda == '77') {
+                            geomLayer.add(new Point(feature.coordinates, { properties: feature.properties}));
+                        }
+                    }
+
+                    geomLayer.disableDepthTesting();
+                })
+
+                del.setActive(false);
+                draw.setActive(false);
 
                 let view = new View({
-                    layers: [ geomLayer ],
-                    interactions: [ draw ]
+                    layers: [ geomLayer, ptcldLayer ],
+                    interactions: [ draw, del, new Snap({ layers: [ ptcldLayer ] }) ]
                 });
+
+                del.addEventListener('selected', (e) => {
+                    geomLayer.remove(e.detail.geometry);
+
+                    let o = { features: [] };
+
+                    for (let point of geomLayer.geometries) {
+                        o.features.push({
+                            properties: { Koda: '77' },
+                            coordinates: point.vectors
+                        });
+                    }
+
+                    fetch(`https://sdms.lgb.si/function/API_DodajTocDN/0.json?dn=${DN}&apikey=0552BF4EC2731BFD7DE5493CA5585108B6C2711A`,
+                    {
+                        mode: 'no-cors',
+                        headers: {
+                        'Content-Type': 'application/json'
+                        },
+                        method: "POST",
+                        body: JSON.stringify(o)
+                    })
+                    .then(function(res){ 
+                        console.log("success.");
+                    })
+                    .catch(function(res){ 
+                        console.log(res) 
+                    });
+                })
+
+                draw.addEventListener('drawend', (e) => {
+                    for (let point of e.detail) geomLayer.add(point);
+
+                    let o = { features: [] };
+
+                    for (let point of geomLayer.geometries) {
+                        o.features.push({
+                            properties: { Koda: '77' },
+                            coordinates: point.vectors
+                        });
+                    }
+
+                    fetch(`https://sdms.lgb.si/function/API_DodajTocDN/0.json?dn=${DN}&apikey=0552BF4EC2731BFD7DE5493CA5585108B6C2711A`,
+                    {
+                        mode: 'no-cors',
+                        headers: {
+                        'Content-Type': 'application/json'
+                        },
+                        method: "POST",
+                        body: JSON.stringify(o)
+                    })
+                    .then(function(res){ 
+                        console.log("success");
+                     })
+                    .catch(function(res){ 
+                        console.log(res) 
+                    });
+                })
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key.toUpperCase() == 'P') {
+                        draw.setActive(true);
+                        del.setActive(false);
+                    }
+                    else if (e.key.toUpperCase() == 'DELETE') {
+                        draw.setActive(false);
+                        del.setActive(true);
+                    }
+                    else if (e.key.toUpperCase() == 'ESCAPE') {
+                        draw.setActive(false);
+                        del.setActive(false);
+                    }            
+                })
 
                 await setView(view);
                 view.center();
-
-                window.draw = draw;
-                //view.removeInteraction(sel)
             }
 
             main();
