@@ -73,6 +73,7 @@ export class Modify extends Interaction {
     setActive(active) {
         if (active == true) {
             this.active = true;
+            this.addEventListeners();
         }
         else {
             this.active = false;

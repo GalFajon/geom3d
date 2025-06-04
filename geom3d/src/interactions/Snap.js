@@ -34,6 +34,11 @@ export class Snap extends Interaction {
         this.generateSnaps2 = this.generateSnaps.bind(this);
         viewer.scene.scene.add(this.snapPointCloud);
 
+        this.addEventListeners();
+        this.generateSnaps();
+    }
+
+    addEventListeners() {
         for (let source of this.parentSources) {
             if (source instanceof GeometryLayer) {
                 source.addEventListener('modifyend', this.generateSnaps2);
@@ -41,8 +46,6 @@ export class Snap extends Interaction {
                 source.addEventListener('removed', this.generateSnaps2);
             }
         }
-
-        this.generateSnaps();
     }
 
     remove() {
@@ -59,7 +62,7 @@ export class Snap extends Interaction {
     }
 
     setActive(active) {
-        if (active == true) { this.active = true; this.generateSnaps(); }
+        if (active == true) { this.active = true; this.generateSnaps(); this.addEventListeners(); }
         else { this.active = false; this.remove(); }
     }
 

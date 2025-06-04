@@ -37,22 +37,19 @@
                     }
                 })
 
-                let ifcLayer = new IFCLayer({ urls: [ 
-                    //'http://localhost:3000/ifcs/test/test.ifc'
-                    'https://projekti.lgb.si/WebPointCloud/IFC/20211110_Marina_Garage_RTC360/Marina_garage_pipes_DX100000_DY460000_DZ300.ifc'
-                ] });
-
                 let geomLayer = new GeometryLayer({ geometries: [ new Polygon([ [ [0,0,0], [10,0,0], [10,10,0], [0,10,0] ], [ [3,3,0], [5,3,0], [5,5,0], [3,5,0] ] ]) ] });
+
+                let draw = new Select({ layer: geomLayer })
 
                 let view = new View({
                     layers: [ geomLayer ],
-                    interactions: [ new Modify({ layer: geomLayer }), new Snap({ layers: [ geomLayer ]}) ]
+                    interactions: [ draw ]
                 });
 
                 await setView(view);
                 view.center();
 
-                window.view = view;
+                window.draw = draw;
                 //view.removeInteraction(sel)
             }
 
