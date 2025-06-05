@@ -24,7 +24,6 @@ export class GeometryLayer extends Layer {
         },
         vertexShader: `
 			varying vec3 vColor;
-            uniform float camPos;
 
 			void main() {
 				vColor = vec3(1.0, 1.0, 1.0);
@@ -92,7 +91,7 @@ export class GeometryLayer extends Layer {
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
 				gl_Position = projectionMatrix * mvPosition;
-                gl_PointSize = ((gl_Position.z / 100.0) + 10.0) <= 30.0 ? ((gl_Position.z / 100.0) + 10.0) : 30.0;
+                gl_PointSize = ((gl_Position.z / 100.0) + 10.0) <= 10.0 ? ((gl_Position.z / 100.0) + 10.0) : 10.0;
 			}
         `,
         fragmentShader: `

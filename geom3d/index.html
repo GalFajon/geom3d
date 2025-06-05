@@ -43,7 +43,14 @@
                     }
                 })
 
-                let geomLayer = new GeometryLayer({ geometries: [ new Point([0,0,0]), new Point([10,10,10]), new Point([2,2,2])] });
+                let geoms = [];
+
+                for (let i=0; i < 1000; i++) {
+                    geoms.push(new Point([Math.random() * 1000,Math.random() * 1000,-Math.random() * 100]));
+                }
+
+                let geomLayer = new GeometryLayer({ geometries: geoms });
+
                 let sel = new Select({ layer: geomLayer });
 
                 let view = new View({
@@ -56,7 +63,7 @@
                 })
 
                 await setView(view);
-                view.center();
+                //view.center();
             }
 
             main();
