@@ -263,7 +263,7 @@ export class GeometryLayer extends Layer {
         }
     }
 
-    async attach() {
+    attach() {
         for (let geometry of this.geometries) this.add(geometry);
 
         this.updatePoints();
@@ -318,7 +318,7 @@ export class GeometryLayer extends Layer {
             if (geometry.highlighted) this.points.get('highlighted').push(geometry);
             else this.points.get('default').push(geometry);
 
-            this.updatePoints();
+            if (this.attached) this.updatePoints();
         }
 
         const customEvent = new CustomEvent('added', { detail: { source: this, geometry: geometry } });
