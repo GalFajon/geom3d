@@ -301,6 +301,7 @@ export class Cursor {
                 for (let source of view.layers) {
                     if ((source instanceof PointcloudLayer || source instanceof GeometryLayer || source instanceof IFCLayer) && source.models) {
                         for (let model of source.models) raycastList.push(model);
+                        if (source instanceof GeometryLayer) raycastList.push(...source.pointscloud.values())
                     }
                 }
 

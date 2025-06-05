@@ -84,7 +84,7 @@ export class Draw extends Interaction {
     }
 
     setActive(active) {
-        if (active == true) { this.active = true; }
+        if (active == true) { this.active = true; this.addEventListeners(); }
         else { this.active = false; this.remove(); }
     }
 

@@ -11,7 +11,39 @@ export class DrawHelper {
 
     static lineMaterial = new LineMaterial({ color: 'blue', linewidth: 5, vertexColors: false, resolution: new THREE.Vector2(1000, 1000), dashed: false, alphaToCoverage: true });
     static meshMaterial = new THREE.MeshBasicMaterial({ color: 'blue', transparent: false });
-    static pointMaterial = new THREE.PointsMaterial({ transparent: true, size: 0.5, sizeAttenuation: true, map: Cursor.generateSpriteTexture('blue'), depthTest: false, depthWrite: false })
+    //static pointMaterial = new THREE.PointsMaterial({ transparent: true, size: 0.5, sizeAttenuation: true, map: Cursor.generateSpriteTexture('blue'), depthTest: false, depthWrite: false })
+    static pointMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+            color: { value: new THREE.Color(0xffffff) },
+            pointTexture: { value: Cursor.generateSpriteTexture('blue') },
+        },
+        vertexShader: `
+			varying vec3 vColor;
+            uniform float camPos;
+
+			void main() {
+				vColor = vec3(1.0, 1.0, 1.0);
+                
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				gl_Position = projectionMatrix * mvPosition;
+                gl_PointSize = ((gl_Position.z / 100.0) + 10.0) <= 10.0 ? ((gl_Position.z / 100.0) + 10.0) : 10.0;
+			}
+        `,
+        fragmentShader: `
+        	uniform vec3 color;
+			uniform sampler2D pointTexture;
+
+			varying vec3 vColor;
+
+			void main() {
+				gl_FragColor = vec4( color * vColor, 1.0 );
+				gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
+			}
+        `,
+        depthTest: false,
+        transparent: true
+    });
 
     constructor(config) {
         this.Vectors = [];
