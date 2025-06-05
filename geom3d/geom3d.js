@@ -5,7 +5,6 @@ import { viewer, initialize as initializeDependencies } from "./src/misc/Depende
 import { PointcloudLayer } from "./src/layers/PointcloudLayer";
 import { GeometryLayer } from "./src/layers/GeometryLayer";
 import { OverlayLayer } from "./src/layers/OverlayLayer";
-import { GLTFLayer } from './src/layers/GLTFLayer';
 import { IFCLayer } from "./src/layers/IFCLayer";
 
 // overlay

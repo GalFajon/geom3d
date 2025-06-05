@@ -11,6 +11,7 @@ export class View {
 
     static overlayScene = new THREE.Scene();
     static overlayRenderer = new CSS2DRenderer();
+    static gpuPickingScene = new THREE.Scene();
 
     static pointMinScale = 0.1;
     static pointMaxScale = 3;
