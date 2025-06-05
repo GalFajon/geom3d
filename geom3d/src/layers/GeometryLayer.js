@@ -119,6 +119,7 @@ export class GeometryLayer extends Layer {
     pointscloud = new Map()
     pointvertices = new Map()
 
+    gpuPickingScene = new THREE.Scene();
     gpuPointscloud = new Map()
     gpuPointColorIds = new Map()
     gpuPointColors = new Map()
@@ -132,18 +133,18 @@ export class GeometryLayer extends Layer {
 
         this.points.set('default', []);
         this.points.set('highlighted', []);
+        
+        let def = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.pointMaterial);
+        let highlighted = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.selectedPointMaterial);
 
-        //let def = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.pointMaterial);
-        //let highlighted = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.selectedPointMaterial);
-        
-        let def = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.pickingPointMaterial);
-        let highlighted = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.pickingPointMaterial);
-        
+        let defGpu = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.pickingPointMaterial);
+        let highlightedGpu = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.pickingPointMaterial);
+
         this.pointscloud.set('default', def);
         this.pointscloud.set('highlighted', highlighted);
 
-        this.gpuPointscloud.set('default', def.clone());
-        this.gpuPointscloud.set('highlighted', highlighted.clone());
+        this.gpuPointscloud.set('default', defGpu);
+        this.gpuPointscloud.set('highlighted', highlightedGpu);
 
         this.pointvertices.set('default', []);
         this.pointvertices.set('highlighted', []);
@@ -207,7 +208,7 @@ export class GeometryLayer extends Layer {
                 }
 
                 let rgb = color.setHex(colorIndex);
-                this.gpuPointColorIds.set(rgb, geometry);
+                this.gpuPointColorIds.set(colorIndex, geometry);
 
                 colorIndex++;
 
@@ -231,10 +232,9 @@ export class GeometryLayer extends Layer {
             if (this.depthTesting) viewer.scene.scene.remove(value);
             else View.overlayScene.remove(value);
 
-            View.gpuPickingScene.remove(this.gpuPointscloud[key]);
+            this.gpuPickingScene.remove(this.gpuPointscloud[key]);
 
             if (this.pointvertices.get(key).length > 0) {
-                console.log(this.gpuPointColors.get(key));
                 value.geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.pointvertices.get(key), 3));
                 value.geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.gpuPointColors.get(key), 3));
                 value.geometry.setDrawRange(0, this.pointvertices.get(key).length);
@@ -252,7 +252,7 @@ export class GeometryLayer extends Layer {
                 if (this.depthTesting) viewer.scene.scene.add(value);
                 else View.overlayScene.add(value);
 
-                View.gpuPickingScene.add(this.gpuPointscloud.get(key));
+                this.gpuPickingScene.add(this.gpuPointscloud.get(key));
             }
             else {
                 value.geometry.dispose();

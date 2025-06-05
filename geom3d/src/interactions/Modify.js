@@ -108,15 +108,27 @@ export class Modify extends Interaction {
             if (event.button == this.button) {
                 if (View.cursor.movedMouse == false) {
                     let intersect = this.getMouseIntersect(event);
+                    let isPointGpuPicked = false;
 
                     if (this.selectedObject && this.selectedVector.coordinates) {
                         this.dispatchModifyEnd();
                         this.clearSelection();
                     }
-                    else if (intersect || View.cursor.snapped || this.target) {
+                    else {
                         if (this.target) this.selectedObject = this.target;
                         else if (this.parentSource.geometries.includes(View.cursor.snappedObject)) this.selectedObject = View.cursor.snappedObject;
                         else if (intersect) this.selectedObject = intersect.object.userData;
+                        else {
+                            let id = View.getGpuPickIntersect(event, this.parentSource.gpuPickingScene);
+
+                            if (id > 0) {
+                                let geom = this.parentSource.gpuPointColorIds.get(id);
+                                if (geom) {
+                                    this.selectedObject = geom;
+                                    isPointGpuPicked = true;
+                                }
+                            }
+                        }
 
                         if (this.selectedObject) {
                             this.selectedObject.beingModified = true;
@@ -129,14 +141,14 @@ export class Modify extends Interaction {
                             if (this.selectedObject.vectors) {
                                 if (this.selectedObject instanceof Point) {
                                     let [x, y, z] = this.selectedObject.vectors;
-
-                                    if (cursorPos.distanceTo(new THREE.Vector3(x, y, z)) < nearestDistv || nearestDistv === null) {
+                                    
+                                    if (cursorPos.distanceTo(new THREE.Vector3(x, y, z)) < nearestDistv || nearestDistv === null || isPointGpuPicked) {
                                         nearestDistv = cursorPos.distanceTo(new THREE.Vector3(x, y, z));
                                         nearestCoordsv = [x, y, z];
                                         nearestIndexv = 0;
                                     }
 
-                                    if (nearestDistv < this.clickRange) this.selectedVector = { coordinates: nearestCoordsv, index: nearestIndexv, holeIndex: undefined };
+                                    if (nearestDistv < this.clickRange || isPointGpuPicked) this.selectedVector = { coordinates: nearestCoordsv, index: nearestIndexv, holeIndex: undefined };
                                 }
                                 else {
                                     for (let i = 0; i < this.selectedObject.vectors.length; i++) {
@@ -234,9 +246,9 @@ export class Modify extends Interaction {
 
                             this.dispatchModifyStart();
                         }
-                    }
-                    else {
-                        this.clearSelection();
+                        else {
+                            this.clearSelection();
+                        }
                     }
                 }
             }
@@ -302,7 +314,7 @@ export class Modify extends Interaction {
         if (this.parentSource.models) {
             intersects.push(...this.raycaster.intersectObjects(this.parentSource.models, true));
         }
-        if (this.parentSource instanceof GeometryLayer && this.parentSource.pointscloud) {
+        /*if (this.parentSource instanceof GeometryLayer && this.parentSource.pointscloud) {
             for (let [key,value] of this.parentSource.pointscloud.entries()) {
                 if (this.parentSource.pointscloud[key] && this.parentSource.points[key].length > 0) {
                     let pointIntersects = this.raycaster.intersectObject(this.parentSource.pointscloud[key], true);
@@ -311,7 +323,7 @@ export class Modify extends Interaction {
                     }
                 }
             }
-        }
+        }*/
 
         intersects.sort((first, second) => (first.distance > second.distance) ? 1 : -1)
         return intersects[0];

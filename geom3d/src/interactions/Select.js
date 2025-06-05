@@ -71,12 +71,25 @@ export class Select extends Interaction {
                         const customEvent = new CustomEvent('selected', { detail: { geometry: this.selectedObject, clickPosition: intersect.point.toArray() } });
                         this.dispatchEvent(customEvent); 
                     }
+                    else if (View.cursor.snappedObject && this.parentSource.Geometries.includes(View.cursor.snappedObject)) {
+                        this.selectedObject = View.cursor.snappedObject;
+                        if (this.highlight) this.parentSource.highlightGeometry(this.selectedObject);
+                        const customEvent = new CustomEvent('selected', { detail: { geometry: this.selectedObject, clickPosition: View.cursor.position } });
+                        this.dispatchEvent(customEvent); 
+                    }
                     else {
-                        if (View.cursor.snappedObject && this.parentSource.Geometries.includes(View.cursor.snappedObject)) {
-                            this.selectedObject = View.cursor.snappedObject;
-                            if (this.highlight) this.parentSource.highlightGeometry(this.selectedObject);
-                            const customEvent = new CustomEvent('selected', { detail: { geometry: this.selectedObject, clickPosition: View.cursor.position } });
-                            this.dispatchEvent(customEvent); 
+                        let id = View.getGpuPickIntersect(event, this.parentSource.gpuPickingScene);
+
+                        if (id > 0) {
+                            let geom = this.parentSource.gpuPointColorIds.get(id);
+
+                            if (geom) {
+                                this.selectedObject = geom;
+
+                                if (this.highlight) this.parentSource.highlightGeometry(geom);
+                                const customEvent = new CustomEvent('selected', { detail: { geometry: geom, clickPosition: View.cursor.position } });
+                                this.dispatchEvent(customEvent); 
+                            }
                         }
                     }
                 }
@@ -98,7 +111,7 @@ export class Select extends Interaction {
         if (this.parentSource.models) {
             intersects.push(...this.raycaster.intersectObjects( this.parentSource.models, intersectChildren ));
         }
-        if (this.parentSource.pointscloud) {
+        /*if (this.parentSource.pointscloud) {
             for (let [key, value] of this.parentSource.pointscloud.entries()) {
                 if (this.parentSource.pointvertices.get(key).length > 0) {
                     let pointIntersects = this.raycaster.intersectObject(value, false);
@@ -108,7 +121,7 @@ export class Select extends Interaction {
                     }
                 }
             }
-        }
+        }*/
 
         intersects.sort((first, second) => {
             let v1 = null;

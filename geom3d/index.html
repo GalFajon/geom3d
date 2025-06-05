@@ -44,11 +44,16 @@
                 })
 
                 let geomLayer = new GeometryLayer({ geometries: [ new Point([0,0,0]), new Point([10,10,10]), new Point([2,2,2])] });
+                let sel = new Select({ layer: geomLayer });
 
                 let view = new View({
                     layers: [ geomLayer ],
-                    interactions: []
+                    interactions: [ sel ]
                 });
+
+                sel.addEventListener('selected', (e) => {
+                    console.log(e.detail);
+                })
 
                 await setView(view);
                 view.center();
