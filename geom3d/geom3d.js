@@ -73,7 +73,7 @@ async function initializeViewer(config) {
 
 // add namespaces
 export {
-    PointcloudLayer, GeometryLayer, OverlayLayer, GLTFLayer, IFCLayer,
+    PointcloudLayer, GeometryLayer, OverlayLayer, IFCLayer,
     Overlay,
     Line, Polygon, Point,
     Draw, Snap, Modify, Select,

@@ -50,6 +50,34 @@ export class GeometryLayer extends Layer {
         transparent: true
     });
 
+    static pickingPointMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+            color: { value: new THREE.Color('red') },
+        },
+        vertexShader: `
+            attribute vec3 color;
+			varying vec3 vColor;
+
+			void main() {
+				vColor = color;
+                
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				gl_Position = projectionMatrix * mvPosition;
+                gl_PointSize = ((gl_Position.z / 100.0) + 10.0) <= 30.0 ? ((gl_Position.z / 100.0) + 10.0) : 30.0;
+			}
+        `,
+        fragmentShader: `
+			varying vec3 vColor;
+
+			void main() {
+				gl_FragColor = vec4(vColor, 1.0);
+			}
+        `,
+        depthTest: true,
+        transparent: true
+    })
+
     static selectedPointMaterial = new THREE.ShaderMaterial({
         uniforms: {
             color: { value: new THREE.Color(0xffffff) },
@@ -57,7 +85,6 @@ export class GeometryLayer extends Layer {
         },
         vertexShader: `
 			varying vec3 vColor;
-            uniform float camPos;
 
 			void main() {
 				vColor = vec3(1.0, 1.0, 1.0);
@@ -91,6 +118,10 @@ export class GeometryLayer extends Layer {
     points = new Map()
     pointscloud = new Map()
     pointvertices = new Map()
+
+    gpuPointscloud = new Map()
+    gpuPointColorIds = new Map()
+    gpuPointColors = new Map()
     
     depthTesting = true;
 
@@ -102,8 +133,17 @@ export class GeometryLayer extends Layer {
         this.points.set('default', []);
         this.points.set('highlighted', []);
 
-        this.pointscloud.set('default', new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.pointMaterial));
-        this.pointscloud.set('highlighted', new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.selectedPointMaterial));
+        //let def = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.pointMaterial);
+        //let highlighted = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.selectedPointMaterial);
+        
+        let def = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.pickingPointMaterial);
+        let highlighted = new THREE.Points(new THREE.BufferGeometry(), GeometryLayer.pickingPointMaterial);
+        
+        this.pointscloud.set('default', def);
+        this.pointscloud.set('highlighted', highlighted);
+
+        this.gpuPointscloud.set('default', def.clone());
+        this.gpuPointscloud.set('highlighted', highlighted.clone());
 
         this.pointvertices.set('default', []);
         this.pointvertices.set('highlighted', []);
@@ -144,6 +184,9 @@ export class GeometryLayer extends Layer {
     }
 
     updatePoints() {
+        this.gpuPointColors.set('default', []);
+        this.gpuPointColors.set('highlighted', []);
+
         this.pointvertices.set('default', []);
         this.pointvertices.set('highlighted', []);
 
@@ -153,6 +196,9 @@ export class GeometryLayer extends Layer {
         let rootCoords = [];
         let first = true;
 
+        let color = new THREE.Color();
+        let colorIndex = 1;
+
         for (let geometry of this.geometries) {
             if (geometry instanceof Point) {
                 if (first == true) {
@@ -160,15 +206,23 @@ export class GeometryLayer extends Layer {
                     first = false;
                 }
 
+                let rgb = color.setHex(colorIndex);
+                this.gpuPointColorIds.set(rgb, geometry);
+
+                colorIndex++;
+
                 let relativeCoords = [geometry.vectors[0] - rootCoords[0], geometry.vectors[1] - rootCoords[1], geometry.vectors[2] - rootCoords[2]];
 
                 if (geometry.highlighted) {
                     this.points.get('highlighted').push(geometry);
                     this.pointvertices.get('highlighted').push(...relativeCoords);
+                    this.gpuPointColors.get('highlighted').push(rgb.r, rgb.g, rgb.b);
+
                 }
                 else {
                     this.points.get('default').push(geometry);
                     this.pointvertices.get('default').push(...relativeCoords);
+                    this.gpuPointColors.get('default').push(rgb.r, rgb.g, rgb.b);
                 }
             }
         }
@@ -177,23 +231,35 @@ export class GeometryLayer extends Layer {
             if (this.depthTesting) viewer.scene.scene.remove(value);
             else View.overlayScene.remove(value);
 
-            View.gpuPickingScene.remove(value);
+            View.gpuPickingScene.remove(this.gpuPointscloud[key]);
 
             if (this.pointvertices.get(key).length > 0) {
+                console.log(this.gpuPointColors.get(key));
                 value.geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.pointvertices.get(key), 3));
+                value.geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.gpuPointColors.get(key), 3));
                 value.geometry.setDrawRange(0, this.pointvertices.get(key).length);
                 value.geometry.verticesNeedUpdate = true;
                 value.geometry.computeBoundingSphere();
                 value.position.set(...rootCoords);
 
+                this.gpuPointscloud.get(key).geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.pointvertices.get(key), 3));
+                this.gpuPointscloud.get(key).geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.gpuPointColors.get(key), 3));
+                this.gpuPointscloud.get(key).geometry.setDrawRange(0, this.pointvertices.get(key).length);
+                this.gpuPointscloud.get(key).geometry.verticesNeedUpdate = true;
+                this.gpuPointscloud.get(key).geometry.computeBoundingSphere();
+                this.gpuPointscloud.get(key).position.set(...rootCoords);
+
                 if (this.depthTesting) viewer.scene.scene.add(value);
                 else View.overlayScene.add(value);
 
-                View.gpuPickingScene.add(value);
+                View.gpuPickingScene.add(this.gpuPointscloud.get(key));
             }
             else {
                 value.geometry.dispose();
                 value.material.dispose();
+
+                this.gpuPointscloud.get(key).geometry.dispose();
+                this.gpuPointscloud.get(key).material.dispose();
             }
         }
     }

@@ -11,7 +11,11 @@ export class View {
 
     static overlayScene = new THREE.Scene();
     static overlayRenderer = new CSS2DRenderer();
+
+    // gpu picking
     static gpuPickingScene = new THREE.Scene();
+    static gpuPickingTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+    static gpuPixelBuffer = new Uint8Array(4);
 
     static pointMinScale = 0.1;
     static pointMaxScale = 3;
@@ -167,3 +171,21 @@ export class View {
         }
     }
 }
+
+document.addEventListener('mousemove', (e) => {
+    console.log(View.gpuPickingScene);
+    
+    // do GPU picking for points
+    viewer.renderer.setRenderTarget(View.gpuPickingTexture)
+    viewer.renderer.render(View.gpuPickingScene, viewer.scene.getActiveCamera());
+    viewer.renderer.setRenderTarget(null);
+
+    let x = e.clientX * window.devicePixelRatio;
+    let y = View.gpuPickingTexture.height - e.clientY * window.devicePixelRatio;
+
+    // read the selected pixel
+    viewer.renderer.readRenderTargetPixels(View.gpuPickingTexture, x, y, 1, 1, View.gpuPixelBuffer);
+
+    let id =(View.gpuPixelBuffer[0] << 16) | (View.gpuPixelBuffer[1] << 8) | (View.gpuPixelBuffer[2]);    
+    console.log(id);
+})
