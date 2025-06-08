@@ -98,18 +98,20 @@ export class IFCLayer extends Layer {
 
     bbox() {
         let bbox = new THREE.Box3();
+        const fragmentBbox = components.get(OBC.BoundingBoxer);
 
         for (let model of this.models) {
-            let modelBbox = new THREE.Box3();
+            fragmentBbox.add(model);
+            const mesh = fragmentBbox.getMesh();
+            mesh.geometry.computeBoundingBox();
 
-            for (let child of model.children) {
-                modelBbox.union(child.geometry.boundingBox);
-            }
-
-            modelBbox.translate(model.position);
-            bbox.union(modelBbox);
+            let bbox2 = mesh.geometry.boundingBox.clone();            
+            bbox2.translate(model.position);
+            bbox.union(bbox2);
         }
 
-        return bbox.expandByScalar(0.05);
+        fragmentBbox.reset();
+
+        return bbox;
     }
 }

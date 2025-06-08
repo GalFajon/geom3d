@@ -11,7 +11,6 @@ export class DrawHelper {
 
     static lineMaterial = new LineMaterial({ color: 'blue', linewidth: 5, vertexColors: false, resolution: new THREE.Vector2(1000, 1000), dashed: false, alphaToCoverage: true });
     static meshMaterial = new THREE.MeshBasicMaterial({ color: 'blue', transparent: false });
-    //static pointMaterial = new THREE.PointsMaterial({ transparent: true, size: 0.5, sizeAttenuation: true, map: Cursor.generateSpriteTexture('blue'), depthTest: false, depthWrite: false })
     static pointMaterial = new THREE.ShaderMaterial({
         uniforms: {
             color: { value: new THREE.Color(0xffffff) },

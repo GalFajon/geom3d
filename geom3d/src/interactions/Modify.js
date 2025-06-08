@@ -314,16 +314,6 @@ export class Modify extends Interaction {
         if (this.parentSource.models) {
             intersects.push(...this.raycaster.intersectObjects(this.parentSource.models, true));
         }
-        /*if (this.parentSource instanceof GeometryLayer && this.parentSource.pointscloud) {
-            for (let [key,value] of this.parentSource.pointscloud.entries()) {
-                if (this.parentSource.pointscloud[key] && this.parentSource.points[key].length > 0) {
-                    let pointIntersects = this.raycaster.intersectObject(this.parentSource.pointscloud[key], true);
-                    for (let intersect of pointIntersects) {
-                        intersects.push({ object: { userData: this.parentSource.points[intersect.index] }, point: intersect.point, distance: intersect.distance });
-                    }
-                }
-            }
-        }*/
 
         intersects.sort((first, second) => (first.distance > second.distance) ? 1 : -1)
         return intersects[0];

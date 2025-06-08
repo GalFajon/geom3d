@@ -53,7 +53,6 @@ export class NoCloudControls extends EarthControls {
             let camera = this.scene.getActiveCamera();
             let view = this.viewer.scene.view;
 
-            // let camera = this.viewer.scene.camera;
             let mouse = e.drag.end;
             let domElement = this.viewer.renderer.domElement;
 
@@ -110,7 +109,6 @@ export class NoCloudControls extends EarthControls {
                 pivotToCamTarget.applyAxisAngle(new THREE.Vector3(0, 0, 1), yawDelta);
 
                 let newCam = new THREE.Vector3().addVectors(this.pivot, pivotToCam);
-                // TODO: Unused: let newCamTarget = new THREE.Vector3().addVectors(this.pivot, pivotToCamTarget);
 
                 view.position.copy(newCam);
                 view.yaw += yawDelta;
@@ -133,9 +131,8 @@ export class NoCloudControls extends EarthControls {
                 this.pivotIndicator.position.copy(I.location);
                 this.targetZ = I.location.z;
             }
-            // Gal -> Kontrole se zdaj da premikati brez pivota
             else {
-                let vec = new THREE.Vector3(); // create once and reuse
+                let vec = new THREE.Vector3();
 
                 let mouse = new THREE.Vector2(
                     (e.mouse.x / this.renderer.domElement.clientWidth) * 2 - 1,
@@ -192,7 +189,6 @@ export class NoCloudControls extends EarthControls {
 
         let progression = 1 - fade;
 
-        // compute zoom
         if (this.wheelDelta !== 0) {
             let I = Potree.Utils.getMousePointCloudIntersection(
                 this.viewer.inputHandler.mouse,
@@ -219,10 +215,9 @@ export class NoCloudControls extends EarthControls {
 
                 this.targetZ = I.location.z;
             }
-            // Gal -> Zoom brez pointcloud intersectiona
             else {
-                let vec = new THREE.Vector3(); // create once and reuse
-                let pos = new THREE.Vector3(); // create once and reuse
+                let vec = new THREE.Vector3();
+                let pos = new THREE.Vector3();
 
                 vec.set(
                     (this.viewer.inputHandler.mouse.x / this.renderer.domElement.clientWidth) * 2 - 1,
@@ -259,7 +254,6 @@ export class NoCloudControls extends EarthControls {
             }
         }
 
-        // apply zoom
         if (this.zoomDelta.length() !== 0) {
             let p = this.zoomDelta.clone().multiplyScalar(progression);
             let newPos = new THREE.Vector3().addVectors(view.position, p);
@@ -276,7 +270,6 @@ export class NoCloudControls extends EarthControls {
             this.pivotIndicator.scale.set(scale, scale, scale);
         }
 
-        // decelerate over time
         {
             this.zoomDelta.multiplyScalar(fade);
             this.wheelDelta = 0;

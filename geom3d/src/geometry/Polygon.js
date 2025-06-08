@@ -1,6 +1,5 @@
 import { Geometry } from './Geometry.js';
 import { THREE } from '../misc/DependencyManager.js';
-import { ConvexGeometry } from '../three/convexgeom/ConvexGeometry.js';
 import * as earcut from 'earcut'
 
 import { LineMaterial } from '../three/fatlines/LineMaterial.js';

@@ -73480,7 +73480,7 @@ ENDSEC
 		}
 
 		initTHREE() {
-			this.renderer = new WebGLRenderer({ alpha: true, premultipliedAlpha: false });
+			this.renderer = new WebGLRenderer({ alpha: true, premultipliedAlpha: false, logarithmicDepthBuffer: true });
 			this.renderer.setClearColor(0x000000, 0);
 			this.renderer.setSize(10, 10);
 			this.renderer.autoClear = false;
@@ -89491,7 +89491,8 @@ ENDSEC
 				alpha: true,
 				premultipliedAlpha: false,
 				canvas: canvas,
-				context: context
+				context: context,
+				logarithmicDepthBuffer: true
 			});
 			this.renderer.sortObjects = false;
 			this.renderer.setSize(width, height);

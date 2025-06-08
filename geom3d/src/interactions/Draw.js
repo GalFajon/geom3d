@@ -90,7 +90,7 @@ export class Draw extends Interaction {
 
     handleGeometrySourcePointerUp(event) {
         if (this.active) {
-            if (event.button == 0) { // left click
+            if (event.button == 0) {
                 let intersect = this.getMouseIntersect(event);
 
                 if (
@@ -100,16 +100,14 @@ export class Draw extends Interaction {
                     this.vectors.length < this.maxVertices
                 ) {
                     if (this.drawHelper) {
-                        //if ((this.DrawWithoutSnap == false && intersect) || this.DrawWithoutSnap == true) {
                         this.vectors.push(View.cursor.position);
                         this.drawHelper.addVector(View.cursor.position);
                         this.dispatchVertexAdded({ vertex: JSON.parse(JSON.stringify(View.cursor.position)), index: this.drawHelper.Vectors.length - 1 });
-                        //}
                     }
                 }
             }
 
-            else if (event.button == 2) { // right click
+            else if (event.button == 2) {
                 this.vectors = [];
 
                 if (this.drawHelper && !View.cursor.movedMouse) {

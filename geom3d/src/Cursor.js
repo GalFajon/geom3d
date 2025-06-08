@@ -166,7 +166,6 @@ export class Cursor {
             let snappedToPtcld = false;
             let snappedToIFC = false;
 
-            // do ifc snapping -> get three nearest vertices to the mouse intersected face and add them as snap points
             if (snapIFCs.length > 0) {
                 for (let model of snapIFCs) {
                     let offset = (new THREE.Vector3()).setFromMatrixPosition(model.coordinationMatrix);

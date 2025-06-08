@@ -1,8 +1,6 @@
 import { THREE, viewer } from "./misc/DependencyManager";
 import { Cursor } from "./Cursor.js";
 import { CSS2DRenderer, CSS2DObject } from "./three/CSS2DRenderer.js";
-import { Draw } from "./interactions/Draw.js";
-import { OverlayLayer } from "./layers/OverlayLayer.js";
 import { GeometryLayer } from "./layers/GeometryLayer.js";
 import { Vector3 } from "../public/dependencies/potree/build/libs/three.js/build/three.module.js";
 
@@ -12,7 +10,6 @@ export class View {
     static overlayScene = new THREE.Scene();
     static overlayRenderer = new CSS2DRenderer();
 
-    // gpu picking
     static gpuPickingTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
     static gpuPixelBuffer = new Uint8Array(4);
 
@@ -28,8 +25,9 @@ export class View {
     }
 
     async initialize() {
-        viewer.renderer.domElement.parentElement.appendChild(View.overlayRenderer.domElement);
+        console.log(viewer.scene.getActiveCamera());
 
+        viewer.renderer.domElement.parentElement.appendChild(View.overlayRenderer.domElement);
         let container = document.getElementById('potree_render_area').getBoundingClientRect();
         View.overlayRenderer.setSize(container.width, container.height);
 
@@ -129,27 +127,11 @@ export class View {
         let pr = Potree.Utils.projectedRadius(1, viewer.scene.getActiveCamera(), distance, viewer.clientwidth, viewer.renderer.domElement.clientHeight);
         let scale = 30 / pr;
 
-        // Refractor this to apply to shader too
-        //if (scale < View.pointMinScale) scale = View.pointMinScale;
         if (scale > View.pointMaxScale) scale = View.pointMaxScale;
 
-        //for (let interaction of this.interactions) {
-        //    if (interaction instanceof Draw) {
-        //        interaction.drawHelper.pointscloud.material.size = scale;
-        //    }
-        //}
-
         for (let layer of this.layers) {
-            if (layer instanceof OverlayLayer && layer.UseVisibilityDistance) {
-                for (let overlay of layer.overlays) {
-                    if (overlay.model.position.distanceTo(viewer.scene.view.position) > overlay.VisibilityDistance) overlay.model.visible = false;
-                    else if (layer.visible) overlay.model.visible = true;
-                }
-            }
-
             if (layer instanceof GeometryLayer) {
                 Cursor.raycaster.params.Points.threshold = scale;
-                //for (let value of layer.pointscloud.values()) value.material.size = scale;
             }
         }
     }

@@ -28,13 +28,7 @@
         </div>
 
         <script type="module">
-            import { initialize, setView, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, OverlayLayer, Overlay, IFCLayer, GeoJSON } from './geom3d.js';
-
-            // http://127.0.0.1:5500/index.html?pointcloudUrl=https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20220219_viadukt_Bohinjska_Bela/metadata.json&DN=2022-0052
-            
-            let params = new URLSearchParams(document.location.search);
-            let pointcloudUrl = params.get("pointcloudUrl");
-            let DN = params.get("DN");
+            import { initialize, setView, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, IFCLayer, GeoJSON } from './geom3d.js';
 
             async function main() {
                 await initialize({
@@ -42,25 +36,21 @@
                         background: 'skybox'
                     }
                 })
+                
+                let geomLayer = new GeometryLayer({ geometries: [] })
+                let pointcloudLayer = new PointcloudLayer({ urls: ['https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20220219_viadukt_Bohinjska_Bela/metadata.json'] });
 
-                let geoms = [];
-
-                for (let i=0; i < 1000000 / 2; i++) {
-                    geoms.push(new Point([Math.random() * 1000000 / 2,Math.random() * 1000000 / 2,-Math.random() * 100]));
-                }
-
-                let geomLayer = new GeometryLayer({ geometries: geoms });
-
-                let sel = new Select({ layer: geomLayer });
+                let draw = new Draw({ layer: geomLayer, type: 'Point' });
 
                 let view = new View({
-                    layers: [ geomLayer ],
-                    interactions: [ sel ]
+                    layers: [ pointcloudLayer, geomLayer ],
+                    interactions: [ draw, new Snap({ layers: [pointcloudLayer] }) ]
                 });
 
-                sel.addEventListener('selected', (e) => {
-                    console.log(e.detail);
+                draw.addEventListener('drawend', (e) => {
+                    for (let point of e.detail) geomLayer.add(point);
                 })
+
 
                 await setView(view);
                 view.center();

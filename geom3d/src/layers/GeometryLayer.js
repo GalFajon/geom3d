@@ -12,10 +12,9 @@ export class GeometryLayer extends Layer {
     static meshSelectionMaterial = new THREE.MeshBasicMaterial( {color: 'lightgreen', side: THREE.DoubleSide, transparent: false } );
     static lineSelectionMaterial = new LineMaterial( { color: 'lightgreen', linewidth: 5, vertexColors: false, resolution: new THREE.Vector2(1000, 1000), dashed: false, alphaToCoverage: true });
     
-    //static pointMaterial = new THREE.PointsMaterial({ color: '#C41E3A', size: 0.5, sizeAttenuation: true });
+    static pointMaterial2 = new THREE.PointsMaterial({ color: '#C41E3A', size: 0.2, sizeAttenuation: true, depthTest: true });
     //static selectedPointMaterial = new THREE.PointsMaterial({ color: 'lightgreen', size: 0.5, sizeAttenuation: true });
 
-    //static pointMaterial = new THREE.PointsMaterial({ transparent: true, size: 0.5, sizeAttenuation: true, map: Cursor.generateSpriteTexture('red') })
     //  / gl_Position.z
     static pointMaterial = new THREE.ShaderMaterial({
         uniforms: {
@@ -23,30 +22,25 @@ export class GeometryLayer extends Layer {
             pointTexture: { value: Cursor.generateSpriteTexture('red') },
         },
         vertexShader: `
-			varying vec3 vColor;
-
 			void main() {
-				vColor = vec3(1.0, 1.0, 1.0);
-                
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-
-				gl_Position = projectionMatrix * mvPosition;
+                gl_Position = projectionMatrix * mvPosition;
+                gl_Position.z -= 0.01 / gl_Position.z;
                 gl_PointSize = ((gl_Position.z / 100.0) + 10.0) <= 10.0 ? ((gl_Position.z / 100.0) + 10.0) : 10.0;
-			}
+            }
         `,
         fragmentShader: `
         	uniform vec3 color;
 			uniform sampler2D pointTexture;
 
-			varying vec3 vColor;
-
 			void main() {
-				gl_FragColor = vec4( color * vColor, 1.0 );
-				gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
+				gl_FragColor = vec4( color, 1.0 );
+				gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord ) * 1.0;
 			}
         `,
         depthTest: true,
-        transparent: true
+        transparent: true,
+        depthWrite: false,
     });
 
     static pickingPointMaterial = new THREE.ShaderMaterial({
@@ -54,17 +48,12 @@ export class GeometryLayer extends Layer {
             color: { value: new THREE.Color('red') },
         },
         vertexShader: `
-            attribute vec3 color;
-			varying vec3 vColor;
-
 			void main() {
-				vColor = color;
-                
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-
-				gl_Position = projectionMatrix * mvPosition;
-                gl_PointSize = ((gl_Position.z / 100.0) + 10.0) <= 30.0 ? ((gl_Position.z / 100.0) + 10.0) : 30.0;
-			}
+                gl_Position = projectionMatrix * mvPosition;
+                gl_Position.z -= 0.01 / gl_Position.z;
+                gl_PointSize = ((gl_Position.z / 100.0) + 10.0) <= 10.0 ? ((gl_Position.z / 100.0) + 10.0) : 10.0;
+            }
         `,
         fragmentShader: `
 			varying vec3 vColor;
@@ -74,7 +63,7 @@ export class GeometryLayer extends Layer {
 			}
         `,
         depthTest: true,
-        transparent: true
+        transparent: true,
     })
 
     static selectedPointMaterial = new THREE.ShaderMaterial({
@@ -83,22 +72,16 @@ export class GeometryLayer extends Layer {
             pointTexture: { value: Cursor.generateSpriteTexture('lightgreen') },
         },
         vertexShader: `
-			varying vec3 vColor;
-
 			void main() {
-				vColor = vec3(1.0, 1.0, 1.0);
-                
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-
-				gl_Position = projectionMatrix * mvPosition;
+                gl_Position = projectionMatrix * mvPosition;
+                gl_Position.z -= 0.01 / gl_Position.z;
                 gl_PointSize = ((gl_Position.z / 100.0) + 10.0) <= 10.0 ? ((gl_Position.z / 100.0) + 10.0) : 10.0;
-			}
+            }
         `,
         fragmentShader: `
         	uniform vec3 color;
 			uniform sampler2D pointTexture;
-
-			varying vec3 vColor;
 
 			void main() {
 				gl_FragColor = vec4( color * vColor, 1.0 );
@@ -106,7 +89,7 @@ export class GeometryLayer extends Layer {
 			}
         `,
         depthTest: true,
-        transparent: true
+        transparent: true,
     })
 
     visible = true;
@@ -381,6 +364,11 @@ export class GeometryLayer extends Layer {
             }
         }
 
+        if (this.geometries.length == 1) bbox.expandByScalar(2)
+
         return bbox;
     }
 }
+
+console.log(GeometryLayer.pointMaterial);
+console.log(GeometryLayer.pointMaterial2);

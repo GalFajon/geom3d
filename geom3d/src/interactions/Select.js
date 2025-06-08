@@ -111,17 +111,6 @@ export class Select extends Interaction {
         if (this.parentSource.models) {
             intersects.push(...this.raycaster.intersectObjects( this.parentSource.models, intersectChildren ));
         }
-        /*if (this.parentSource.pointscloud) {
-            for (let [key, value] of this.parentSource.pointscloud.entries()) {
-                if (this.parentSource.pointvertices.get(key).length > 0) {
-                    let pointIntersects = this.raycaster.intersectObject(value, false);
-
-                    for (let intersect of pointIntersects) {
-                        intersects.push({ object: { userData: this.parentSource.points.get(key)[intersect.index] }, point: intersect.point, distance: intersect.distance });
-                    }
-                }
-            }
-        }*/
 
         intersects.sort((first, second) => {
             let v1 = null;
