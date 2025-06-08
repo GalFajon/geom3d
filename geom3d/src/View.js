@@ -25,8 +25,6 @@ export class View {
     }
 
     async initialize() {
-        console.log(viewer.scene.getActiveCamera());
-
         viewer.renderer.domElement.parentElement.appendChild(View.overlayRenderer.domElement);
         let container = document.getElementById('potree_render_area').getBoundingClientRect();
         View.overlayRenderer.setSize(container.width, container.height);
