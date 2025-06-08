@@ -105,6 +105,8 @@ export class View {
         if (this.layers.length > 0) for (let layer of this.layers) bbox.union(layer.bbox());
         else bbox = new THREE.Box3(new Vector3(0, 0, 0), new Vector3(10, 10, 10));
 
+        if (bbox.isEmpty()) bbox = new THREE.Box3(new Vector3(0, 0, 0), new Vector3(10, 10, 10));
+
         this.zooomToBbox(bbox);
     }
 

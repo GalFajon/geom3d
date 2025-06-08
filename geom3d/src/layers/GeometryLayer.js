@@ -369,6 +369,3 @@ export class GeometryLayer extends Layer {
         return bbox;
     }
 }
-
-console.log(GeometryLayer.pointMaterial);
-console.log(GeometryLayer.pointMaterial2);

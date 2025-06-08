@@ -38,19 +38,11 @@
                 })
                 
                 let geomLayer = new GeometryLayer({ geometries: [] })
-                let pointcloudLayer = new PointcloudLayer({ urls: ['https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20220219_viadukt_Bohinjska_Bela/metadata.json'] });
-
-                let draw = new Draw({ layer: geomLayer, type: 'Point' });
 
                 let view = new View({
-                    layers: [ pointcloudLayer, geomLayer ],
-                    interactions: [ draw, new Snap({ layers: [pointcloudLayer] }) ]
+                    layers: [ geomLayer ],
+                    interactions: [ new Snap({ layers: [geomLayer] }) ]
                 });
-
-                draw.addEventListener('drawend', (e) => {
-                    for (let point of e.detail) geomLayer.add(point);
-                })
-
 
                 await setView(view);
                 view.center();
