@@ -21,7 +21,12 @@ export class Snap extends Interaction {
         }
 
         this.snapPoints = [];
+        
         this.snapPointCloud = new THREE.Points(new THREE.BufferGeometry(), Snap.pointMaterial);
+        this.snapPointCloudPositions = [];
+        this.snapPointCloudReferences = [];
+        this.snapPointCloudRoot = [];
+
         this.snapPotreePointclouds = [];
         this.snapLines = [];
 
@@ -33,6 +38,7 @@ export class Snap extends Interaction {
     initialize() {
         this.generateSnaps2 = this.generateSnaps.bind(this);
         viewer.scene.scene.add(this.snapPointCloud);
+        this.snapPointCloud.visible = false;
 
         this.addEventListeners();
         this.generateSnaps();
@@ -67,6 +73,10 @@ export class Snap extends Interaction {
     }
 
     generateSnaps() {
+        this.snapPointCloudPositions = [];
+        this.snapPointCloudReferences = [];
+        this.snapPointCloudRoot = [];
+        
         this.clearSnapLines();
         this.clearSnapPoints();
 
@@ -79,28 +89,44 @@ export class Snap extends Interaction {
             }
         }
 
-        for (let geometry of geometriesToSnapTo) {
-            if (geometry instanceof Point) {
-                this.createSnapPoint(geometry.vectors, geometry)
-            }
-            if (geometry instanceof Polygon) {
-                for (let vector of geometry.vectors) this.createSnapPoint(vector, geometry);
+        if (geometriesToSnapTo.length > 0) {
+            let first = true;
 
-                for (let hole of geometry.holes) {
-                    this.createSnapLine([...hole, hole[0]], geometry);
+            for (let geometry of geometriesToSnapTo) {
+                if (geometry instanceof Point) {
+                    if (first) this.snapPointCloudRoot = geometriesToSnapTo[0].vectors;
 
-                    for (let holePosition of hole) {
-                        this.createSnapPoint(holePosition, geometry);
-                    }
+                    this.snapPointCloudPositions.push(geometry.vectors[0] - this.snapPointCloudRoot[0], geometry.vectors[1] - this.snapPointCloudRoot[1], geometry.vectors[2] - this.snapPointCloudRoot[2]);
+                    this.snapPointCloudReferences.push(geometry);
                 }
+                if (geometry instanceof Polygon) {
+                    if (first) this.snapPointCloudRoot = geometriesToSnapTo[0].vectors[0];
 
-                this.createSnapLine([...geometry.vectors, geometry.vectors[0]], geometry);
-            }
-            if (geometry instanceof Line) {
-                this.createSnapLine(geometry.vectors, geometry);
+                    for (let vector of geometry.vectors) {
+                        this.snapPointCloudPositions.push(vector[0] - this.snapPointCloudRoot[0], vector[1] - this.snapPointCloudRoot[1], vector[2] - this.snapPointCloudRoot[2]);
+                        this.snapPointCloudReferences.push(geometry);
+                    }
 
-                for (let vector of geometry.vectors) {
-                    this.createSnapPoint(vector, geometry);
+                    for (let hole of geometry.holes) {
+                        this.createSnapLine([...hole, hole[0]], geometry);
+
+                        for (let holePosition of hole) {
+                            this.snapPointCloudPositions.push(holePosition[0] - this.snapPointCloudRoot[0], holePosition[1] - this.snapPointCloudRoot[1], holePosition[2] - this.snapPointCloudRoot[2]);
+                            this.snapPointCloudReferences.push(geometry);
+                        }
+                    }
+
+                    this.createSnapLine([...geometry.vectors, geometry.vectors[0]], geometry);
+                }
+                if (geometry instanceof Line) {
+                    if (first) this.snapPointCloudRoot = geometriesToSnapTo[0].vectors[0];
+
+                    this.createSnapLine(geometry.vectors, geometry);
+
+                    for (let vector of geometry.vectors) {
+                        this.snapPointCloudPositions.push(vector[0] - this.snapPointCloudRoot[0], vector[1] - this.snapPointCloudRoot[1], vector[2] - this.snapPointCloudRoot[2]);
+                        this.snapPointCloudReferences.push(geometry);
+                    }
                 }
             }
         }
@@ -125,21 +151,13 @@ export class Snap extends Interaction {
         this.snapLines = [];
     }
 
-    createSnapPoint([x, y, z], referencedObject) {
-        this.snapPoints.push({ coordinates: [x, y, z], refersTo: referencedObject });
-    }
-
     updateSnapPointHelper() {
-        if (this.snapPoints[0] && this.snapPoints[0].coordinates) {
-            let root = this.snapPoints[0].coordinates;
-            let flat = [];
-            for (let point of this.snapPoints) flat.push(point.coordinates[0] - root[0], point.coordinates[1] - root[1], point.coordinates[2] - root[2]);
-
-            this.snapPointCloud.geometry.setAttribute('position', new THREE.Float32BufferAttribute(flat, 3));
-            this.snapPointCloud.geometry.setDrawRange(0, this.snapPoints.length);
+        if (this.snapPointCloudPositions.length > 0) {
+            this.snapPointCloud.geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.snapPointCloudPositions, 3));
+            this.snapPointCloud.geometry.setDrawRange(0, this.snapPointCloudPositions.length);
             this.snapPointCloud.geometry.verticesNeedUpdate = true;
             this.snapPointCloud.geometry.computeBoundingSphere();
-            this.snapPointCloud.position.set(...root);
+            this.snapPointCloud.position.set(this.snapPointCloudRoot[0],this.snapPointCloudRoot[1],this.snapPointCloudRoot[2]);
         }
     }
 

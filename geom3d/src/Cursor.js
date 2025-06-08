@@ -86,7 +86,7 @@ export class Cursor {
         this.snapDistance = 1;
         this.ifcSnapDistance = 0.1;
         this.ifcVertexDistanceBuffer = 0.1;
-        this.pointSnapDistance = 0.3;
+        this.pointSnapDistance = null;
 
         this.view = undefined;
 
@@ -142,14 +142,18 @@ export class Cursor {
             let snapPointRaycastList = []
             let snapPointClouds = [];
             let snapPointList = [];
+            let snapPointReferenceList = [];
+            let snapPointRootList = [];
             let snapIFCs = [];
 
             for (let interaction of view.interactions) {
                 if (interaction instanceof Snap) {
                     if (interaction.active == true) {
                         if (interaction.target == undefined || !interaction.target.beingModified) {
-                            snapPointList.push(interaction.snapPoints);
+                            snapPointList.push(interaction.snapPointCloudPositions);
                             snapPointRaycastList.push(interaction.snapPointCloud);
+                            snapPointReferenceList.push(interaction.snapPointCloudReferences);
+                            snapPointRootList.push(interaction.snapPointCloudRoot);
                             snapRaycastList.push(...interaction.snapLines.map(line => line.model));
 
                             for (let source of interaction.parentSources) {
@@ -210,11 +214,9 @@ export class Cursor {
                         vC.applyAxisAngle(new THREE.Vector3(1,0,0),Math.PI / 2);
                         vC.add(new THREE.Vector3(-offset.x, offset.z, -offset.y));
 
-                        if (vA.distanceTo(vB) > 1 || vA.distanceTo(vC) > 1) {
-                            if (intersect.point.distanceTo(vA) < this.ifcVertexDistanceBuffer) { this.snapTo([vA.x, vA.y, vA.z], intersect.object); snappedToIFC = true; }
-                            if (intersect.point.distanceTo(vB) < this.ifcVertexDistanceBuffer) { this.snapTo([vB.x, vB.y, vB.z], intersect.object); snappedToIFC = true; }
-                            if (intersect.point.distanceTo(vC) < this.ifcVertexDistanceBuffer) { this.snapTo([vC.x, vC.y, vC.z], intersect.object); snappedToIFC = true; }   
-                        }                 
+                        if (intersect.point.distanceTo(vA) < this.ifcVertexDistanceBuffer) { this.snapTo([vA.x, vA.y, vA.z], intersect.object); snappedToIFC = true; }
+                        else if (intersect.point.distanceTo(vB) < this.ifcVertexDistanceBuffer) { this.snapTo([vB.x, vB.y, vB.z], intersect.object); snappedToIFC = true; }
+                        else if (intersect.point.distanceTo(vC) < this.ifcVertexDistanceBuffer) { this.snapTo([vC.x, vC.y, vC.z], intersect.object); snappedToIFC = true; }   
                     }
                 }
             }
@@ -224,10 +226,10 @@ export class Cursor {
                     let pointIntersects = this.getMouseIntersect(mouse, [snapPointRaycastList[i]]);
 
                     if (pointIntersects && pointIntersects[0]) {
-                        let p = new THREE.Vector3(...snapPointList[i][pointIntersects[0].index].coordinates);
+                        let p = new THREE.Vector3(snapPointList[i][pointIntersects[0].index * 3], snapPointList[i][pointIntersects[0].index * 3 + 1], snapPointList[i][pointIntersects[0].index * 3 + 2]);
 
-                        if (pointIntersects[0].index !== undefined && p.distanceTo(pointIntersects[0].point) < this.pointSnapDistance) {
-                            this.snapTo(snapPointList[i][pointIntersects[0].index].coordinates, snapPointList[i][pointIntersects[0].index].refersTo);
+                        if (pointIntersects[0].index !== undefined && (!this.pointSnapDistance || p.distanceTo(pointIntersects[0].point) < this.pointSnapDistance)) {
+                            this.snapTo(p.add(new THREE.Vector3(...snapPointRootList[i])).toArray(), snapPointReferenceList[i][pointIntersects[0].index]);
                             snappedToPoint = true;
                             break;
                         }

@@ -39,7 +39,6 @@ export class Line extends Geometry {
 
     localizeVectors(flatPositions) {
         let localPositions = [0, 0, 0];
-
         let initialPosition = new THREE.Vector3(flatPositions[0], flatPositions[1], flatPositions[2]);
 
         for (let i = 3; i < flatPositions.length; i += 3) {
@@ -63,6 +62,9 @@ export class Line extends Geometry {
             this.model.material.dispose();
 
             this.model.geometry = geometry;
+            this.model.computeLineDistances();
+            this.model.scale.set(1, 1, 1);
+            this.model.position.set(...this.vectors[0]);
         }
         else {
             this.model = new Line2(geometry, this.material);

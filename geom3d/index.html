@@ -36,12 +36,16 @@
                         background: 'skybox'
                     }
                 })
+
+                let geoms = [];
+
+                for (let i=0; i < 10000; i++) geoms.push(new Line([[Math.random() * 1000, Math.random() * 1000, Math.random() * 100],[Math.random() * 1000, Math.random() * 1000, Math.random() * 100]]))
                 
-                let geomLayer = new GeometryLayer({ geometries: [] })
+                let geomLayer = new GeometryLayer({ geometries: geoms })
 
                 let view = new View({
                     layers: [ geomLayer ],
-                    interactions: [ new Snap({ layers: [geomLayer] }) ]
+                    interactions: [ new Modify({ layer: geomLayer }) ]
                 });
 
                 await setView(view);

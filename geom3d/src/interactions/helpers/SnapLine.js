@@ -11,7 +11,8 @@ export class SnapLine extends Geometry {
         let geometry = new THREE.BufferGeometry().setFromPoints(threeVectors);
 
         this.model = new THREE.Line(geometry, SnapLine.material);
-
+        this.model.visible = false;
+        
         this.refersTo = referencedObject;
         this.model.userData = this;
     }
