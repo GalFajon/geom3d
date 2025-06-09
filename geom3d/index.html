@@ -22,13 +22,15 @@
     </head>
 
     <body>
+        <span id="label" style="color: white;">Test.</span>
+
         <div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
             <div id="potree_render_area"></div>
             <div id="potree_sidebar_container"> </div>
         </div>
 
         <script type="module">
-            import { initialize, setView, PointcloudLayer, GeometryLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, IFCLayer, GeoJSON } from './geom3d.js';
+            import { initialize, setView, PointcloudLayer, GeometryLayer, OverlayLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, IFCLayer, GeoJSON, Overlay } from './geom3d.js';
 
             async function main() {
                 await initialize({
@@ -37,15 +39,11 @@
                     }
                 })
 
-                let geoms = [];
-
-                for (let i=0; i < 10000; i++) geoms.push(new Line([[Math.random() * 1000, Math.random() * 1000, Math.random() * 100],[Math.random() * 1000, Math.random() * 1000, Math.random() * 100]]))
-                
-                let geomLayer = new GeometryLayer({ geometries: geoms })
+                let overlayLayer = new OverlayLayer({ overlays: [ new Overlay([0,0,0], { element: document.getElementById('label'), clickable: false })] })
 
                 let view = new View({
-                    layers: [ geomLayer ],
-                    interactions: [ new Modify({ layer: geomLayer }) ]
+                    layers: [ overlayLayer ],
+                    interactions: []
                 });
 
                 await setView(view);
