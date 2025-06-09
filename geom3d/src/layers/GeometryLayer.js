@@ -317,7 +317,8 @@ export class GeometryLayer extends Layer {
             let i = this.geometries.indexOf(geometry);
             
             if (geometry instanceof Line || geometry instanceof Polygon) {
-                viewer.scene.scene.remove(geometry.model);
+                if (this.depthTesting) viewer.scene.scene.remove(geometry.model);
+                else View.overlayScene.remove(geometry.model);
             }
 
             if (removeFromArray) {
