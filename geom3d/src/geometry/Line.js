@@ -25,9 +25,6 @@ export class Line extends Geometry {
         else this.material = Line.material;
 
         this.update();
-
-        // TODO: Add a way to color the geometries using custom materials
-
         this.model.userData = this;
     }
 

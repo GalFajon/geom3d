@@ -2,7 +2,7 @@ export class Geometry {
     vectors = [];
     properties = {};
     
-    construtor(properties) { 
+    constructor(properties) { 
         if (properties) this.properties = properties;
     }
 }

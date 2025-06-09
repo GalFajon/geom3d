@@ -39,10 +39,13 @@
                     }
                 })
 
+                let point = new Point([0,0,0], { properties: { test: 'test' }});
+                
                 let overlayLayer = new OverlayLayer({ overlays: [ new Overlay([0,0,0], { element: document.getElementById('label'), clickable: false })] })
+                let geomLayer = new GeometryLayer({ geometries: [ point ] });
 
                 let view = new View({
-                    layers: [ overlayLayer ],
+                    layers: [ geomLayer ],
                     interactions: []
                 });
 
