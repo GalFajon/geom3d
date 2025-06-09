@@ -71,7 +71,7 @@ export class Select extends Interaction {
                         const customEvent = new CustomEvent('selected', { detail: { geometry: this.selectedObject, clickPosition: intersect.point.toArray() } });
                         this.dispatchEvent(customEvent); 
                     }
-                    else if (View.cursor.snappedObject && this.parentSource.Geometries.includes(View.cursor.snappedObject)) {
+                    else if (View.cursor.snappedObject && this.parentSource.geometries.includes(View.cursor.snappedObject)) {
                         this.selectedObject = View.cursor.snappedObject;
                         if (this.highlight) this.parentSource.highlightGeometry(this.selectedObject);
                         const customEvent = new CustomEvent('selected', { detail: { geometry: this.selectedObject, clickPosition: View.cursor.position } });
