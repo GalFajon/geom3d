@@ -48,20 +48,23 @@ export class GeometryLayer extends Layer {
             color: { value: new THREE.Color('red') },
         },
         vertexShader: `
-			void main() {
-				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+        	attribute vec3 color;
+            varying vec3 vColor;
+
+            void main() {
+                vColor = color;
+                vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
                 gl_Position = projectionMatrix * mvPosition;
                 gl_Position.z -= 0.01 / gl_Position.z;
                 gl_PointSize = ((gl_Position.z / 100.0) + 10.0) <= 10.0 ? ((gl_Position.z / 100.0) + 10.0) : 10.0;
             }
         `,
         fragmentShader: `
-        	uniform vec3 color;
 			uniform sampler2D pointTexture;
+            varying vec3 vColor;
 
 			void main() {
-				gl_FragColor = vec4( color, 1.0 );
-				gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord ) * 1.0;
+				gl_FragColor = vec4( vColor, 1.0 );
 			}
         `,
         depthTest: true,
@@ -235,7 +238,7 @@ export class GeometryLayer extends Layer {
 
                 if (this.depthTesting) viewer.scene.scene.add(value);
                 else View.overlayScene.add(value);
-
+                
                 this.gpuPickingScene.add(this.gpuPointscloud.get(key));
             }
             else {

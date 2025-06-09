@@ -120,7 +120,7 @@ export class Modify extends Interaction {
                         else if (intersect) this.selectedObject = intersect.object.userData;
                         else {
                             let id = View.getGpuPickIntersect(event, this.parentSource.gpuPickingScene);
-
+                            
                             if (id > 0) {
                                 let geom = this.parentSource.gpuPointColorIds.get(id);
                                 if (geom) {

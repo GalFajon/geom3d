@@ -32,19 +32,10 @@ export class Draw extends Interaction {
 
         this.vectors = [];
 
-        this.viewingImage360 = false;
-        this.viewingOrientedImage = false;
-
         this.active = true;
     }
 
     addEventListeners() {
-        viewer.addEventListener('360image_focused', this.setViewingImage3602);
-        viewer.addEventListener('360image_unfocused', this.unsetViewingImage3602);
-
-        viewer.addEventListener('oriented_image_focused', this.setViewingOrientedImage2);
-        viewer.addEventListener('oriented_image_unfocused', this.unsetViewingOrientedImage2);
-        
         if (!this.parentSource) {
             throw 'Must have parameter layer.';
         }
@@ -57,22 +48,12 @@ export class Draw extends Interaction {
     }
 
     removeEventListeners() {
-        viewer.removeEventListener('360image_focused', this.setViewingImage3602);
-        viewer.removeEventListener('360image_unfocused', this.unsetViewingImage3602);
-
-        viewer.removeEventListener('oriented_image_focused', this.setViewingOrientedImage2);
-        viewer.removeEventListener('oriented_image_unfocused', this.unsetViewingOrientedImage2);
-
         if (this.parentSource instanceof GeometryLayer) {
             this.domElement.removeEventListener('pointerup', this.handleGeometrySourcePointerUp2);
         }
     }
 
     initialize() {
-        this.setViewingImage3602 = this.setViewingImage360.bind(this);
-        this.unsetViewingImage3602 = this.unsetViewingImage360.bind(this);
-        this.setViewingOrientedImage2 = this.setViewingOrientedImage.bind(this);
-        this.unsetViewingOrientedImage2 = this.unsetViewingOrientedImage.bind(this);
         this.handleGeometrySourcePointerUp2 = this.handleGeometrySourcePointerUp.bind(this);
 
         this.addEventListeners();
@@ -95,8 +76,6 @@ export class Draw extends Interaction {
 
                 if (
                     View.cursor.movedMouse == false &&
-                    (((!this.viewingImage360 && (!intersect || !intersect.object.image360))) || (this.viewingImage360)) &&
-                    (((!this.viewingOrientedImage) && (!intersect || intersect.object.parent.name != "oriented_images")) || (this.viewingOrientedImage && intersect.object.parent.name == "oriented_images")) &&
                     this.vectors.length < this.maxVertices
                 ) {
                     if (this.drawHelper) {
@@ -173,21 +152,5 @@ export class Draw extends Interaction {
         const customEvent = new CustomEvent('drawend', { detail: detail, source: this.parentSource });
         this.dispatchEvent(customEvent);
         this.parentSource.dispatchEvent(customEvent);
-    }
-
-    setViewingOrientedImage() {
-        this.viewingOrientedImage = true;
-    }
-
-    unsetViewingOrientedImage() {
-        this.viewingOrientedImage = false;
-    }
-
-    setViewingImage360() {
-        this.viewingImage360 = true;
-    }
-
-    unsetViewingImage360() {
-        this.viewingImage360 = false
     }
 }
