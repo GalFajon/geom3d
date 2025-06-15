@@ -89818,8 +89818,8 @@ ENDSEC
 					if (near === Infinity) {
 						near = 0.1;
 					}
-
-					camera.near = 0.01; // GAL
+										
+					camera.near = near; // GAL
 					camera.far = far;
 				} else {
 					// don't change near and far in this case
