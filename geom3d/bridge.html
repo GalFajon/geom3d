@@ -1,0 +1,343 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="./dependencies/potree/build/potree/potree.css">
+        <link rel="stylesheet" type="text/css" href="./dependencies/potree/build/libs/jquery-ui/jquery-ui.min.css">
+        <link rel="stylesheet" type="text/css" href="./dependencies/potree/build/libs/openlayers3/ol.css">
+        <link rel="stylesheet" type="text/css" href="./dependencies/potree/build/libs/spectrum/spectrum.css">
+        <link rel="stylesheet" type="text/css" href="./dependencies/potree/build/libs/jstree/themes/mixed/style.css">
+
+        <script src="./dependencies/potree/build/libs/jquery/jquery-3.1.1.min.js"></script>
+        <script src="./dependencies/potree/build/libs/spectrum/spectrum.js"></script>
+        <script src="./dependencies/potree/build/libs/jquery-ui/jquery-ui.min.js"></script>
+
+        <script src="./dependencies/potree/build/libs/other/BinaryHeap.js"></script>
+        <script src="./dependencies/potree/build/libs/tween/tween.min.js"></script>
+        <script src="./dependencies/potree/build/libs/d3/d3.min.js"></script>
+        <script src="./dependencies/potree/build/libs/proj4/proj4.js"></script>
+        <script src="./dependencies/potree/build/libs/openlayers3/ol.js"></script>
+        <script src="./dependencies/potree/build/libs/i18next/i18next.js"></script>
+        <script src="./dependencies/potree/build/libs/jstree/jstree.js"></script>
+        <script src="./dependencies/potree/build/potree/potree.js"></script>
+        <script src="./dependencies/potree/build/libs/plasio/js/laslaz.js"></script>
+    </head>
+
+    <body>
+        <span id="label" style="color: white;">Test.</span>
+
+        <div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
+            <div id="potree_render_area"></div>
+            <div id="potree_sidebar_container"> </div>
+        </div>
+
+        <script type="module">
+            import { initialize, setView, PointcloudLayer, GeometryLayer, OverlayLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, IFCLayer, GeoJSON, Overlay } from './geom3d.js';
+
+            async function main() {
+                await initialize({
+                    viewer: {
+                        background: 'skybox'
+                    }
+                })
+
+                let geomLayer = new GeometryLayer({ 
+                    geometries: GeoJSON.import(
+                        {
+                            type: 'FeatureCollection',
+                            features:
+                                JSON.parse(`
+                                [
+                                    {
+                                        "coordinates": [
+                                            467740.29899998236,
+                                            105024.27000000037,
+                                            324.99000001335094
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.3590001183,
+                                            105024.65699994373,
+                                            324.9849999046321
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.4020000272,
+                                            105024.94099997997,
+                                            324.99000001335094
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.4349999883,
+                                            105025.16099999828,
+                                            324.98999999701925
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.44900000107,
+                                            105025.28199999762,
+                                            324.99200000107237
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.4549999983,
+                                            105025.27800000441,
+                                            325.19200000333734
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.4929999866,
+                                            105025.62300000178,
+                                            324.9940000051255
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.4380000093,
+                                            105025.28600000573,
+                                            324.4840000011916
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.505999997,
+                                            105025.80499999924,
+                                            324.4899999984498
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.2940000006,
+                                            105024.29300000041,
+                                            324.4819999971385
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.35399999854,
+                                            105024.66800000715,
+                                            324.48299999916503
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.39099998854,
+                                            105024.93700000024,
+                                            324.4840000011916
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.47899998806,
+                                            105025.58899999993,
+                                            324.4899999984498
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467740.4360000052,
+                                            105025.28600000573,
+                                            324.2590000085826
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467725.021000004,
+                                            104992.93000000107,
+                                            324.996999996304
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467725.0229999932,
+                                            104992.95900000024,
+                                            324.89800000056573
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467725.01400000474,
+                                            104992.96399999547,
+                                            324.69600001358936
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467725.0280000033,
+                                            104992.97199999678,
+                                            324.5130000003571
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467725.02200000605,
+                                            104992.96399999547,
+                                            324.37900001478147
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467725.0120000007,
+                                            104992.93099997616,
+                                            324.25800002574874
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467725.00000000617,
+                                            104992.81899999964,
+                                            324.1480000085826
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.96499999485,
+                                            104992.6370000062,
+                                            324.1020000047679
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.94600000104,
+                                            104992.51700000143,
+                                            324.1200000114436
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.9400000038,
+                                            104992.42300001955,
+                                            324.2300000257487
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.9350000011,
+                                            104992.38399998522,
+                                            324.4079999999101
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.9400000038,
+                                            104992.41500000334,
+                                            324.5469999947543
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.9509999963,
+                                            104992.48400000906,
+                                            324.6199999936814
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.9669999989,
+                                            104992.5700000031,
+                                            324.6410000064368
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.9780000063,
+                                            104992.65000001765,
+                                            324.619000006556
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.9739999982,
+                                            104992.65800000263,
+                                            324.72499999785373
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.9739999982,
+                                            104992.642,
+                                            324.87899999931403
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.9659999969,
+                                            104992.64299998856,
+                                            325.0059999861712
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    {
+                                        "coordinates": [
+                                            467724.993999994,
+                                            104992.76799998856,
+                                            325.04299998664806
+                                        ],
+                                        "type": "Point"
+                                    }
+                                ]
+                                `).map((el) => { return { type: 'Feature', geometry: el} })
+                        }
+                    )
+                });
+
+                let d = new Draw({ layer: geomLayer, type: 'Point' });
+                let ptcldLayer = new PointcloudLayer({ urls: ['https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20221107_most Sava_Sentjakob/metadata.json'] });
+
+                let view = new View({
+                    layers: [ 
+                        geomLayer,
+                        ptcldLayer
+                    ],
+                    interactions: [ d, new Snap({ layers: [ptcldLayer] }) ]
+                });
+
+                d.addEventListener('drawend', (e) => {
+                    for (let point of e.detail) geomLayer.add(point);
+
+                    console.log(geomLayer.geometries);
+                })
+
+                await setView(view);
+                view.center();
+            }
+
+            main();
+        </script>
+    </body>
+</html>
