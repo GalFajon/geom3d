@@ -148,6 +148,9 @@ export class View {
 
         this.scale();
 
+        viewer.scene.getActiveCamera().near = 0.001;
+        viewer.scene.getActiveCamera().far = 1000;
+
         viewer.renderer.clearDepth();
         viewer.renderer.render(View.overlayScene, viewer.scene.getActiveCamera());
         View.overlayRenderer.render(viewer.scene.scene, viewer.scene.getActiveCamera());
