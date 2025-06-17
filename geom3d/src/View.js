@@ -3,6 +3,7 @@ import { Cursor } from "./Cursor.js";
 import { CSS2DRenderer, CSS2DObject } from "./three/CSS2DRenderer.js";
 import { GeometryLayer } from "./layers/GeometryLayer.js";
 import { Vector3 } from "../public/dependencies/potree/build/libs/three.js/build/three.module.js";
+import Stats from "./stats/stats.module.js";
 
 export class View {
     static cursor = new Cursor();
@@ -16,6 +17,9 @@ export class View {
     static pointMinScale = 0.1;
     static pointMaxScale = 3;
 
+    static showProfiler = false;
+    static stats = new Stats();
+
     layers = [];
     interactions = [];
 
@@ -25,6 +29,9 @@ export class View {
     }
 
     async initialize() {
+        View.stats.showPanel( 1 );
+        document.body.appendChild( View.stats.dom );
+
         viewer.renderer.domElement.parentElement.appendChild(View.overlayRenderer.domElement);
         let container = document.getElementById('potree_render_area').getBoundingClientRect();
         View.overlayRenderer.setSize(container.width, container.height);
@@ -137,12 +144,19 @@ export class View {
     }
 
     everyFrame() {
+        if (View.showProfiler) View.stats.begin();
+
         this.scale();
 
         viewer.renderer.clearDepth();
         viewer.renderer.render(View.overlayScene, viewer.scene.getActiveCamera());
         View.overlayRenderer.render(viewer.scene.scene, viewer.scene.getActiveCamera());
         View.overlayRenderer.render(View.overlayScene, viewer.scene.getActiveCamera());
+
+        if (View.showProfiler) View.stats.end();
+        
+        if (!View.showProfiler) View.stats.dom.style.display = 'none';
+        else View.stats.dom.style.display = 'block';
 
         requestAnimationFrame(this.everyFrame.bind(this));
 
