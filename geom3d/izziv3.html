@@ -31,7 +31,7 @@
 
         <script type="module">
             import { initialize, setView, PointcloudLayer, GeometryLayer, OverlayLayer, Line, Polygon, Point, View, Draw, Snap, Select, Modify, IFCLayer, GeoJSON, Overlay } from './geom3d.js';
-            import { generateRandomGeoJSON } from './src/randomgeom/geojsonGenerator.js';
+            import o from './izziv3.js';
 
             async function main() {
                 await initialize({
@@ -40,16 +40,37 @@
                     }
                 })
                 
-                let geomLayer = null;
-                
-                geomLayer = new GeometryLayer({ 
-                    geometries: GeoJSON.import(generateRandomGeoJSON(10000,10000,10000,10,10,0,100,10)) 
+                let geomLayer = new GeometryLayer({
+                    geometries: GeoJSON.import(o)
                 });
 
+                let ptcldLayer = new PointcloudLayer({ urls: ['https://projekti.lgb.si/WebPointCloud/RawData/DataConverted/20221107_most Sava_Sentjakob/metadata.json'] });
+
+                let draw = new Draw({ layer: geomLayer, type: "Line" });
+
                 let view = new View({
-                    layers: [ geomLayer ],
-                    interactions: []
+                    layers: [ 
+                        ptcldLayer,
+                        geomLayer 
+                    ],
+                    interactions: [ 
+                        new Snap({ layers: [ ptcldLayer ]}),
+                        draw
+                    ]
                 });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key == 'Escape') {
+                        draw.setActive(false);
+                        draw.setActive(true);
+                    }
+                })
+                
+                draw.addEventListener('drawend', (e) => {
+                    geomLayer.add(e.detail);
+                })
+
+                geomLayer.disableDepthTesting();
 
                 await setView(view);
                 view.center();

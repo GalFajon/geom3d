@@ -17,7 +17,7 @@ export class View {
     static pointMinScale = 0.1;
     static pointMaxScale = 3;
 
-    static showProfiler = false;
+    static showProfiler = true;
     static stats = new Stats();
 
     layers = [];
