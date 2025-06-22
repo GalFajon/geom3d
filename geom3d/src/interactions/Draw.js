@@ -139,11 +139,9 @@ export class Draw extends Interaction {
 
     undo(index) {
         if (this.active) {
-            if (this.parentSource instanceof GeometrySource) {
-                this.vectors.pop(View.cursor.position);
+            if (this.parentSource instanceof GeometryLayer) {
+                this.vectors.pop(index);
                 if (this.drawHelper) this.drawHelper.undo(index);
-
-                this.parentSource.updatePoints();
             }
         }
     }

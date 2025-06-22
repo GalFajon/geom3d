@@ -10,34 +10,27 @@ import { Cursor } from '../../Cursor.js';
 export class DrawHelper {
 
     static lineMaterial = new LineMaterial({ color: 'blue', linewidth: 5, vertexColors: false, resolution: new THREE.Vector2(1000, 1000), dashed: false, alphaToCoverage: true });
-    static meshMaterial = new THREE.MeshBasicMaterial({ color: 'blue', transparent: false });
+    static meshMaterial = new THREE.MeshBasicMaterial({ color: 'blue', transparent: true, opacity: 0.5 });
     static pointMaterial = new THREE.ShaderMaterial({
         uniforms: {
             color: { value: new THREE.Color(0xffffff) },
             pointTexture: { value: Cursor.generateSpriteTexture('blue') },
         },
         vertexShader: `
-			varying vec3 vColor;
-            uniform float camPos;
-
 			void main() {
-				vColor = vec3(1.0, 1.0, 1.0);
-                
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-
-				gl_Position = projectionMatrix * mvPosition;
+                gl_Position = projectionMatrix * mvPosition;
+                gl_Position.z -= 0.01 / gl_Position.z;
                 gl_PointSize = ((gl_Position.z / 100.0) + 10.0) <= 10.0 ? ((gl_Position.z / 100.0) + 10.0) : 10.0;
-			}
+            }
         `,
         fragmentShader: `
         	uniform vec3 color;
 			uniform sampler2D pointTexture;
 
-			varying vec3 vColor;
-
 			void main() {
-				gl_FragColor = vec4( color * vColor, 1.0 );
-				gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
+				gl_FragColor = vec4( color, 1.0 );
+				gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord ) * 1.0;
 			}
         `,
         depthTest: false,
@@ -93,18 +86,23 @@ export class DrawHelper {
     }
 
     updatePoints() {
-        let root = this.Vectors[0];
-        let flat = [];
-        for (let vector of this.Vectors) flat.push(vector[0] - root[0], vector[1] - root[1], vector[2] - root[2]);
+        if (this.Vectors.length > 0) {
+            let root = this.Vectors[0];
+            let flat = [];
+            
+            for (let vector of this.Vectors) flat.push(vector[0] - root[0], vector[1] - root[1], vector[2] - root[2]);
 
-        this.scene.remove(this.pointscloud);
-        this.pointscloud.geometry.setAttribute('position', new THREE.Float32BufferAttribute(flat, 3));
-        this.pointscloud.geometry.setDrawRange(0, this.Vectors.length);
-        this.pointscloud.geometry.verticesNeedUpdate = true;
-        this.pointscloud.geometry.computeBoundingSphere();
+            this.scene.remove(this.pointscloud);
 
-        this.pointscloud.position.set(...root);
-        this.scene.add(this.pointscloud);
+            this.pointscloud.geometry.dispose();
+            this.pointscloud.geometry.setAttribute('position', new THREE.Float32BufferAttribute(flat, 3));
+            this.pointscloud.geometry.setDrawRange(0, flat.length);
+            this.pointscloud.geometry.verticesNeedUpdate = true;
+            this.pointscloud.geometry.computeBoundingSphere();
+            this.pointscloud.position.set(...root);
+
+            this.scene.add(this.pointscloud);
+        }
     }
 
     undo(index) {
@@ -115,8 +113,10 @@ export class DrawHelper {
 
         if (index) {
             this.Vectors.splice(index, 1)
-            this.Points.splice(index, 1)[0];
+            this.Points.splice(index, 1);
         }
+
+        this.updatePoints();
 
         if (this.Line) this.removeLine();
         if (this.Polygon) this.removePolygon();
@@ -134,8 +134,6 @@ export class DrawHelper {
             this.Polygon = polygon;
             this.Polygon.model.userData = this;
         }
-
-        this.updatePoints();
     }
 
     clear() {

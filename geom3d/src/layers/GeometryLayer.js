@@ -223,14 +223,12 @@ export class GeometryLayer extends Layer {
 
             if (this.pointvertices.get(key).length > 0) {
                 value.geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.pointvertices.get(key), 3));
-                value.geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.gpuPointColors.get(key), 3));
                 value.geometry.setDrawRange(0, this.pointvertices.get(key).length);
                 value.geometry.verticesNeedUpdate = true;
                 value.geometry.computeBoundingSphere();
                 value.position.set(...rootCoords);
 
                 this.gpuPointscloud.get(key).geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.pointvertices.get(key), 3));
-                this.gpuPointscloud.get(key).geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.gpuPointColors.get(key), 3));
                 this.gpuPointscloud.get(key).geometry.setDrawRange(0, this.pointvertices.get(key).length);
                 this.gpuPointscloud.get(key).geometry.verticesNeedUpdate = true;
                 this.gpuPointscloud.get(key).geometry.computeBoundingSphere();

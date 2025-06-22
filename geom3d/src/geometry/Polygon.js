@@ -11,7 +11,7 @@ import * as turf from "@turf/turf";
 
 export class Polygon extends Geometry {
     type = "Polygon"
-    static material = new THREE.MeshBasicMaterial({ color: 'purple', side: THREE.DoubleSide });
+    static material = new THREE.MeshBasicMaterial({ color: 'purple', side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
     static lineMaterial = new LineMaterial({
         color: 0x000000,
         linewidth: 1,

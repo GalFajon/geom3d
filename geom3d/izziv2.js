@@ -1,19 +1,17 @@
 const o = {
-    "type": "FeatureCollection",
-    "name": "izziv2",
-    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::4979" } },
+    "type":"FeatureCollection",
     "features": [
-        { "type": "Feature", "properties": { "ID": 1311836, "Toc": "", "Koda": "77" }, "geometry": { "type": "Point", "coordinates": [ 456904.299999999988358, 107924.24, 314.09 ] } },
-        { "type": "Feature", "properties": { "ID": 1311837, "Toc": "", "Koda": "77" }, "geometry": { "type": "Point", "coordinates": [ 456891.590000000025611, 107937.19, 320.31 ] } },
-        { "type": "Feature", "properties": { "ID": 1311838, "Toc": "", "Koda": "77" }, "geometry": { "type": "Point", "coordinates": [ 456885.020000000018626, 107932.37, 315.26 ] } },
-        { "type": "Feature", "properties": { "ID": 1311839, "Toc": "", "Koda": "77" }, "geometry": { "type": "Point", "coordinates": [ 456876.200000000011642, 107940.79, 315.69 ] } },
-        { "type": "Feature", "properties": { "ID": 1311840, "Toc": "", "Koda": "77" }, "geometry": { "type": "Point", "coordinates": [ 456869.93, 107945.42, 316.09 ] } },
-        { "type": "Feature", "properties": { "ID": 1311841, "Toc": "", "Koda": "77" }, "geometry": { "type": "Point", "coordinates": [ 456866.349999999976717, 107955.56, 321.21 ] } },
-        { "type": "Feature", "properties": { "ID": 1311842, "Toc": "", "Koda": "77" }, "geometry": { "type": "Point", "coordinates": [ 456866.18, 107955.8, 321.33 ] } },
-        { "type": "Feature", "properties": { "ID": 1311843, "Toc": "", "Koda": "77" }, "geometry": { "type": "Point", "coordinates": [ 456862.69, 107948.59, 316.54 ] } },
-        { "type": "Feature", "properties": { "ID": 1311844, "Toc": "", "Koda": "77" }, "geometry": { "type": "Point", "coordinates": [ 456862.590000000025611, 107957.57, 321.26 ] } },
-        { "type": "Feature", "properties": { "ID": 1311845, "Toc": "", "Koda": "77" }, "geometry": { "type": "Point", "coordinates": [ 456860.10999999998603, 107955.83, 321.48 ] } }
+        {"type":"Feature","properties":{},"geometry":{"coordinates":[456904.3020129837,107924.23600003123,314.0899915955961],"type":"Point"}},
+        {"type":"Feature","properties":{},"geometry":{"coordinates":[456891.5920129195,107937.18599986658,320.3099913857877],"type":"Point"}},
+        {"type":"Feature","properties":{},"geometry":{"coordinates":[456885.0220129732,107932.36600005254,315.25999144650996],"type":"Point"}},
+        {"type":"Feature","properties":{},"geometry":{"coordinates":[456876.2020129673,107940.78600024804,315.68999150022864],"type":"Point"}},
+        {"type":"Feature","properties":{},"geometry":{"coordinates":[456869.93201291375,107945.41600003093,316.0899914894253],"type":"Point"}},
+        {"type":"Feature","properties":{},"geometry":{"coordinates":[456862.69201288465,107948.58600011375,316.5399914178997],"type":"Point"}},
+        {"type":"Feature","properties":{},"geometry":{"coordinates":[456860.1120128352,107955.8260000106,321.4799914583564],"type":"Point"}},
+        {"type":"Feature","properties":{},"geometry":{"coordinates":[456862.59201284125,107957.56600009277,321.25999119505286],"type":"Point"}},
+        {"type":"Feature","properties":{},"geometry":{"coordinates":[456866.3520128578,107955.55600002967,321.2099912557751],"type":"Point"}},
+        {"type":"Feature","properties":{},"geometry":{"coordinates":[456866.1820130199,107955.79600002617,321.3299922943115],"type":"Point"}}
     ]
-}
+};
 
 export default o;

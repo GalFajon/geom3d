@@ -17,7 +17,7 @@ export class View {
     static pointMinScale = 0.1;
     static pointMaxScale = 3;
 
-    static showProfiler = true;
+    static showProfiler = false;
     static stats = new Stats();
 
     layers = [];
@@ -30,7 +30,6 @@ export class View {
 
     async initialize() {
         View.stats.showPanel( 1 );
-        document.body.appendChild( View.stats.dom );
 
         viewer.renderer.domElement.parentElement.appendChild(View.overlayRenderer.domElement);
         let container = document.getElementById('potree_render_area').getBoundingClientRect();
@@ -62,6 +61,15 @@ export class View {
         View.cursor.initializeEvents(this);
 
         this.everyFrame();
+    }
+
+    showProfiler() {
+        document.body.appendChild( View.stats.dom );
+        View.showProfiler = true;
+    }
+
+    hideProfiler() {
+        document.body.removeChild( View.stats.dom );
     }
 
     async addLayer(layer) {
