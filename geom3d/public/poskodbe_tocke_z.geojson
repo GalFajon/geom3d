@@ -1,9 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "poskodbe_tocke_z",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "defect_id": "e4065d13-cb3d-413b-8c21-ffe809eca76a", "rank": "concrete (non definable width)", "type": "crack", "image_urls": "(1:P7128745.JPG)", "ELEVATION": 324.876 }, "geometry": { "type": "Point", "coordinates": [ 467749.626065922027919, 105110.499328556004912, 324.876 ] } },
-{ "type": "Feature", "properties": { "defect_id": "8336c146-0b5c-4c5c-b26c-30c65ad94491", "rank": "concrete (> 0.6mm)", "type": "crack", "image_urls": "(5:P7128741.JPG,P7128740.JPG,P7128820.JPG,P7128851.JPG,P7128903.JPG)", "ELEVATION": 324.844 }, "geometry": { "type": "Point", "coordinates": [ 467747.308995695027988, 105109.897324012999889, 324.844 ] } }
-]
-}
