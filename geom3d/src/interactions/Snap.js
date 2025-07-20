@@ -72,7 +72,7 @@ export class Snap extends Interaction {
         else { this.active = false; this.remove(); }
     }
 
-    generateSnaps() {
+    generateSnaps() {       
         this.snapPointCloudPositions = [];
         this.snapPointCloudReferences = [];
         this.snapPointCloudRoot = [];

@@ -261,6 +261,9 @@ export class GeometryLayer extends Layer {
 
         this.geometries = [];
 
+        const customEvent = new CustomEvent('removed', { detail: { source: this, geometry: null } });
+        this.dispatchEvent(customEvent);
+
         this.updatePoints();
         this.attached = false;
     }
